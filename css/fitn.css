@@ -1,0 +1,9 @@
+.icon {
+    height: 50px;
+    width: 50px;
+}
+
+.reveal pre code {
+    max-height: 450px;
+    font-size: 20px;
+}

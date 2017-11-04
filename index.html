@@ -1,0 +1,258 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>reveal.js</title>
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/league.css">
+
+		<link rel="stylesheet" href="css/fitn.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+
+				<section>
+
+					<section>
+						<h2>How doing batch?</h2>
+
+						Développer cette présentation générale!
+
+						1 entity à la fois
+
+						<aside class="notes">
+							Stack maison largement inspiré d'Akeneo batch qui est un portage de Spring Batch (Java) en PHP<br />
+							Ca se présente globalement comme un ETL (Extract / Transform / Load)<br />
+						</aside>
+					</section>
+
+					<section>
+						Add schéma Reader / Processor / Writer
+
+						First big difference, flush is done by batch. Otherwise, it's done unitary
+					</section>
+
+					<section>
+						Presentation du Job
+					</section>
+
+					<section>
+						Presentation du Reader
+					</section>
+
+					<section>
+						Présentation du Processor
+					</section>
+
+					<section>
+						Présentation du Writer
+					</section>
+
+				</section>
+
+				<section>
+					Premier test: Import des catégories
+
+					Create - Batch size = 1 - env = dev
+
+					> bin/console batch:import:category /home/romain/workspace/talks/doctrine-batch/data/categories.csv --env=dev
+
+					Memory: 12.58M
+					job - Time: 1.63s - Memory: 18.87M - Diff: 6.29M
+
+					Que se passe t-il?
+					- 2 queries par item
+					- plein de transactions
+
+					[2017-11-04 21:53:59] doctrine.DEBUG: SELECT c0_.id AS id_0, c0_.code AS code_1, c0_.name AS name_2, c0_.description AS description_3 FROM category c0_ WHERE c0_.code LIKE 'classic_english_style_pale_ale' [] []
+					[2017-11-04 21:53:59] doctrine.DEBUG: SELECT t0.id AS id_1, t0.code AS code_2, t0.name AS name_3, t0.description AS description_4 FROM category t0 WHERE t0.code = ? ["classic_english_style_pale_ale"] []
+					[2017-11-04 21:53:59] doctrine.DEBUG: "START TRANSACTION" [] []
+					[2017-11-04 21:53:59] doctrine.DEBUG: INSERT INTO category (code, name, description) VALUES (?, ?, ?) {"1":"classic_english_style_pale_ale","2":"Classic English-Style Pale Ale","3":"Pigeon. 'I can hardly brea [...]"} []
+					[2017-11-04 21:53:59] doctrine.DEBUG: "COMMIT" [] []
+					<aside class="notes">
+						Possibilité de faire un begin transaction tout au début et d'avoir une grande transaction<br />
+						Question à Benoit: J'ai des temps qui vont de 0.7s à 1.92s sur la même exécution... Pourquoi ?<br />
+						Y a t-il une différence entre la création et l'update? En temps d'execution?
+					</aside>
+				</section>
+
+				<section>
+					Second test: Import des catégories
+
+					Batch size = 1000
+
+					Que se passe t-il?
+					<aside class="notes">Erreur de validation</aside>
+				</section>
+
+
+				<section>
+					<h2>The worst best idea: Doing batch with PHP and Doctrine</h2>
+					<img src="" />
+
+					<aside class="notes">
+						Pourquoi ce sujet ?<br />
+						PHP n'est pas fait pour le batch<br />
+						Doctrine n'est pas fait pour ça non plus<br />
+						Le but n'est pas de critiquer Doctrine ou de vous donner envie de l'utiliser<br />
+						Réutiliser votre stack permet de garder vos entités, validateurs, events, queries, etc.<br />
+						Réel retour d'XP sur des problèmes rencontrés<br />
+						J'espère que ce retour vous apprendra quelques astuces et pourra vous aider<br />
+					</aside>
+				</section>
+
+				<section>
+					<h2>Romain Monceau</h2>
+					<h3 class="fragment"><img src="resources/icons/twitter.png" class="icon" />@RomainMonceau</h3>
+					<h3 class="fragment">25 years old</h3>
+					<h3 class="fragment">+15 years PHP</h3>
+					<h3 class="fragment">Lead Developer @Akeneo <img src="resources/icons/akeneo.png" class="icon" /></h3>
+					<h3 class="fragment">Zytholophile</h3>
+
+					<img src="" />
+				</section>
+
+				<section>
+					<h2><Site web</h2>
+
+					<ul>
+						<li>PHP 7</li>
+						<li>MySQL</li>
+						<li>Symfony 3.3</li>
+						<li>Doctrine</li>
+					</ul>
+					<aside class="notes">
+						Super site web qui recense toutes les bières, toutes les brasseries avec des commentaires des internautes !<br />
+						Une fois le site prêt, je me suis rendu compte qu'il allait falloir que j'importe tout un tas de données.<br />
+
+					</aside>
+				</section>
+
+				<section>
+					Slide Coluche?
+
+					<blockquote>Toute relation avec des projets existants ou ayant existés étant absolument fait exprès</blockquote>
+				</section>
+
+
+
+				<section>
+					<h2>PHP n'est pas fait pour faire du batch</h2>
+
+					Attention à la consommation mémoire<br />
+					Comparaison avec le fonctionnement d'autres langages type Java?<br /><br />
+
+					Pagination mémoire limitée à 10k objets<br />
+
+				</section>
+
+				<section>
+					<h2>Doctrine n'est pas fait pour le batch</h2>
+
+					<img src="resources/img/doctrine_batch_doc.png" />
+				</section>
+
+				<section>
+					<section>
+						<h2>Présentation du model</h2>
+
+						<img src="resources/img/doctrine_example_model.png" />
+					</section>
+					<section>
+						<h4>Doctrine mapping: Beer.orm.yml</h4>
+
+						<pre><code class="yml">BeerBundle\Entity\Beer:
+  type: entity
+  table: beer
+  fields:
+    id:
+      [...]
+    code:
+      [...]
+    name:
+      [...]
+    description:
+      [...]
+    percent:
+      [...]
+    quotation:
+      [...]</code></pre>
+
+						<aside class="notes">Just a specific repository class to search entity from code</aside>
+					</section>
+
+					<section>
+						<h4>Doctrine mapping: Beer.orm.yml</h4>
+
+						<pre><code class="yml">BeerBundle\Entity\Beer:
+  type: entity
+  table: beer
+  manyToOne:
+    brewery:
+      targetEntity: BeerBundle\Entity\Brewery
+      joinColumn:
+        name: brewery_id
+        referencedColumnName: id
+    category:
+      targetEntity: BeerBundle\Entity\Category
+      joinColumn:
+        name: category_id
+        referencedColumnName: id
+						</code></pre>
+					</section>
+
+				</section>
+
+
+
+
+
+
+
+				<section>
+					<h2>What's next?</h2>
+
+					Export?
+					Multi import?
+					Improve performance?
+					Mass Delete?
+				</section>
+
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				]
+			});
+		</script>
+
+	</body>
+</html>
