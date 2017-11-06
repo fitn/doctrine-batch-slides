@@ -27,80 +27,6 @@
 		<div class="reveal">
 			<div class="slides">
 
-				<section>
-
-					<section>
-						<h2>How doing batch?</h2>
-
-						Développer cette présentation générale!
-
-						1 entity à la fois
-
-						<aside class="notes">
-							Stack maison largement inspiré d'Akeneo batch qui est un portage de Spring Batch (Java) en PHP<br />
-							Ca se présente globalement comme un ETL (Extract / Transform / Load)<br />
-						</aside>
-					</section>
-
-					<section>
-						Add schéma Reader / Processor / Writer
-
-						First big difference, flush is done by batch. Otherwise, it's done unitary
-					</section>
-
-					<section>
-						Presentation du Job
-					</section>
-
-					<section>
-						Presentation du Reader
-					</section>
-
-					<section>
-						Présentation du Processor
-					</section>
-
-					<section>
-						Présentation du Writer
-					</section>
-
-				</section>
-
-				<section>
-					Premier test: Import des catégories
-
-					Create - Batch size = 1 - env = dev
-
-					> bin/console batch:import:category /home/romain/workspace/talks/doctrine-batch/data/categories.csv --env=dev
-
-					Memory: 12.58M
-					job - Time: 1.63s - Memory: 18.87M - Diff: 6.29M
-
-					Que se passe t-il?
-					- 2 queries par item
-					- plein de transactions
-
-					[2017-11-04 21:53:59] doctrine.DEBUG: SELECT c0_.id AS id_0, c0_.code AS code_1, c0_.name AS name_2, c0_.description AS description_3 FROM category c0_ WHERE c0_.code LIKE 'classic_english_style_pale_ale' [] []
-					[2017-11-04 21:53:59] doctrine.DEBUG: SELECT t0.id AS id_1, t0.code AS code_2, t0.name AS name_3, t0.description AS description_4 FROM category t0 WHERE t0.code = ? ["classic_english_style_pale_ale"] []
-					[2017-11-04 21:53:59] doctrine.DEBUG: "START TRANSACTION" [] []
-					[2017-11-04 21:53:59] doctrine.DEBUG: INSERT INTO category (code, name, description) VALUES (?, ?, ?) {"1":"classic_english_style_pale_ale","2":"Classic English-Style Pale Ale","3":"Pigeon. 'I can hardly brea [...]"} []
-					[2017-11-04 21:53:59] doctrine.DEBUG: "COMMIT" [] []
-					<aside class="notes">
-						Possibilité de faire un begin transaction tout au début et d'avoir une grande transaction<br />
-						Question à Benoit: J'ai des temps qui vont de 0.7s à 1.92s sur la même exécution... Pourquoi ?<br />
-						Y a t-il une différence entre la création et l'update? En temps d'execution?
-					</aside>
-				</section>
-
-				<section>
-					Second test: Import des catégories
-
-					Batch size = 1000
-
-					Que se passe t-il?
-					<aside class="notes">Erreur de validation</aside>
-				</section>
-
 
 				<section>
 					<h2>The worst best idea: Doing batch with PHP and Doctrine</h2>
@@ -216,21 +142,236 @@
         referencedColumnName: id
 						</code></pre>
 					</section>
+				</section>
+
+				<section>
+
+					<section>
+						<h2>How doing batch?</h2>
+
+						Développer cette présentation générale!
+
+						1 entity à la fois
+
+						<aside class="notes">
+							Stack maison largement inspiré d'Akeneo batch qui est un portage de Spring Batch (Java) en PHP<br />
+							Ca se présente globalement comme un ETL (Extract / Transform / Load)<br />
+						</aside>
+					</section>
+
+					<section>
+						Add schéma Reader / Processor / Writer
+
+						First big difference, flush is done by batch. Otherwise, it's done unitary
+					</section>
+
+					<section>
+						Presentation du Job
+					</section>
+
+					<section>
+						Presentation du Reader
+					</section>
+
+					<section>
+						Présentation du Processor
+					</section>
+
+					<section>
+						Présentation du Writer
+					</section>
 
 				</section>
 
+				<section>
+					Premier test: Import des catégories (150)
+
+					Create - Batch size = 1 - env = dev
+
+					> bin/console batch:import:category /home/romain/workspace/talks/doctrine-batch/data/categories.csv --env=dev
+
+					Memory: 12.58M
+					job - Time: 1.63s - Memory: 18.87M - Diff: 6.29M
+					140 entities created
+
+					Que se passe t-il?
+					- 2 queries par item
+					- plein de transactions
+
+					[2017-11-04 21:53:59] doctrine.DEBUG: SELECT c0_.id AS id_0, c0_.code AS code_1, c0_.name AS name_2, c0_.description AS description_3 FROM category c0_ WHERE c0_.code LIKE 'classic_english_style_pale_ale' [] []
+					[2017-11-04 21:53:59] doctrine.DEBUG: SELECT t0.id AS id_1, t0.code AS code_2, t0.name AS name_3, t0.description AS description_4 FROM category t0 WHERE t0.code = ? ["classic_english_style_pale_ale"] []
+					[2017-11-04 21:53:59] doctrine.DEBUG: "START TRANSACTION" [] []
+					[2017-11-04 21:53:59] doctrine.DEBUG: INSERT INTO category (code, name, description) VALUES (?, ?, ?) {"1":"classic_english_style_pale_ale","2":"Classic English-Style Pale Ale","3":"Pigeon. 'I can hardly brea [...]"} []
+					[2017-11-04 21:53:59] doctrine.DEBUG: "COMMIT" [] []
+
+					Conclusion:
+					Chaque flush est une transaction.
+					Les conseils de doctrine (et même d'une manière générale avec les SGBD) n'est pas de faire plein de transactions.
+					Avec doctrine, il est conseillé de calculer le bon ratio de flush par rapport au nombre d'éléments que vous souhaitez persister.
+					A vous de faire des tests pour trouver ce bon ratio selon vos entités.
+					<aside class="notes">
+						Possibilité de faire un begin transaction tout au début et d'avoir une grande transaction<br />
+						Question à Benoit: J'ai des temps qui vont de 0.7s à 1.92s sur la même exécution... Pourquoi ?<br />
+						Y a t-il une différence entre la création et l'update? En temps d'execution?
+					</aside>
+				</section>
+
+				<section>
+					<section>
+						Second test: Import des catégories (150)
+
+						Create - Batch size = 1000 - env = dev
+
+						> bin/console batch:import:category /home/romain/workspace/talks/doctrine-batch/data/categories.csv --env=dev
+
+						Que se passe t-il?
+						- Erreur de validation
+
+						romain@dandelion:~/workspace/talks/doctrine-batch/demo$ bin/console batch:import:category /home/romain/workspace/talks/doctrine-batch/data/categories.csv --env=dev
+						Memory: 12.58M
+
+						[Doctrine\DBAL\Exception\UniqueConstraintViolationException]
+						An exception occurred while executing 'INSERT INTO category (code, name, description) VALUES (?, ?, ?)' with params ["porter", "Porter", "A second description that seems very cool and better than the previo
+						us one."]:
+
+						SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'porter' for key 'searchunique_idx'
+
+						[Doctrine\DBAL\Driver\PDOException]
+						SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'porter' for key 'searchunique_idx'
+
+						[PDOException]
+						SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'porter' for key 'searchunique_idx'
+
+						TODO: Faire schéma qui explique ce qu'il se passe avec la transaction et pourquoi la validation passe
+
+						<aside class="notes">
+
+						</aside>
+					</section>
+
+					<section>
+						Creation d'un validateur un peu différent. Montrer l'exemple.
+
+						romain@dandelion:~/workspace/talks/doctrine-batch/demo$ bin/console batch:import:category /home/romain/workspace/talks/doctrine-batch/data/categories.csv --env=dev
+						Memory: 12.58M
+						Entity "porter" not valid: The value "porter" is already set in another entity
+						139 entity written
+						job - Time: 0.29s - Memory: 18.87M - Diff: 6.29M
+
+
+						<aside class="notes"></aside>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>Troisième test: Tracking policy</h2>
+
+						Update des catégories (same environment than previously. Juste changemnt de fichier)
+
+						Update - Batch size = 1000 - env = dev
+
+						> bin/console batch:import:category /home/romain/workspace/talks/doctrine-batch/data/categories_update.csv --env=dev
+
+						Que se passe t-il?
+						La validation a bien lieu est remonté, l'objet n'est pas persisté. Mais un update est quand même envoyé.
+
+						Memory: 12.58M
+						Entity "classic_english_style_pale_ale" not valid: This value is too long. It should have 100 characters or less.
+						0 entity written
+
+
+						[Doctrine\DBAL\Exception\DriverException]
+						An exception occurred while executing 'UPDATE category SET name = ? WHERE id = ?' with params ["Classic English-Style Pale Ale - Pigeon. 'I can hardly breathe.' 'I can't go no lower,' said the Cat. '--so.",
+						1]:
+
+						SQLSTATE[22001]: String data, right truncated: 1406 Data too long for column 'name' at row 1
 
 
 
+						[Doctrine\DBAL\Driver\PDOException]
+						SQLSTATE[22001]: String data, right truncated: 1406 Data too long for column 'name' at row 1
 
+
+
+						[PDOException]
+						SQLSTATE[22001]: String data, right truncated: 1406 Data too long for column 'name' at row 1
+
+						<aside class="notes">
+							It tooks a long time to understand what happened.<br />
+						</aside>
+					</section>
+
+					<section>
+						<h2>Change Tracking policies</h2>
+
+						<blockquote>
+							"It is the process of determining what has changed in managed entities since the last time they were synchronized with the db"
+						</blockquote>
+
+						It could be define per entity.<br />
+
+						Deferred Implicit (default): Doctrine detects the changes by a property-by property comparison at commit time. EntityManager::flush(); everything
+						Deferred Explicit: Same but need to call explicitely EntityManager::persist . More efficient than the implicit.
+						Notify: You need to implement by yourself the changes using listeners. It's far more efficient.
+
+
+						<aside class="notes">
+							http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/change-tracking-policies.html<br />
+							Plusieurs solutions. Detach could be one.
+						</aside>
+					</section>
+
+					<section>
+						Change tracking policy
+						<pre><code class="yml">
+BeerBundle\Entity\Category:
+  type: entity
+  table: category
+  repositoryClass: BeerBundle\Entity\Repository\EntityRepository
+  changeTrackingPolicy: DEFERRED_EXPLICIT
+						</code></pre>
+					</section>
+				</section>
+
+				<section>
+					Import des brasseries (50000)
+
+					romain@dandelion:~/workspace/talks/doctrine-batch/demo$ bin/console batch:import:brewery /home/romain/workspace/talks/doctrine-batch/data/brewery.csv --env=dev
+					DEV: job - Time: 335.01s - Memory: 611.6M - Diff: 599.02M
+					PROD: job - Time: 67.73s - Memory: 334.76M - Diff: 324.27M
+
+					Faire graphique avec la consommation mémoire tous les 1000 insertions
+
+
+
+					<aside class="notes"></aside>
+				</section>
+
+				<section>
+					Import des bières (100000)
+
+
+
+				</section>
+
+				<section>
+					<h2>Sujets à aborder</h2>
+
+					- Env dev ou prod
+					- Memory limit
+					- Detach vs clear
+					- ResultMapping & DQL queries
+
+				</section>
 
 
 				<section>
 					<h2>What's next?</h2>
 
 					Export?
-					Multi import?
-					Improve performance?
+					Multi import? (beers + breweries) -> Quick presentation
+					Improve performance? (test "Change tracking policy" -> notify)
 					Mass Delete?
 				</section>
 
