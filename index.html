@@ -45,11 +45,11 @@
 
 				<section>
 					<h2>Romain Monceau</h2>
-					<h3 class="fragment"><img src="resources/icons/twitter.png" class="icon" />@RomainMonceau</h3>
-					<h3 class="fragment">25 years old</h3>
-					<h3 class="fragment">+15 years PHP</h3>
-					<h3 class="fragment">Lead Developer @Akeneo <img src="resources/icons/akeneo.png" class="icon" /></h3>
-					<h3 class="fragment">Zytholophile</h3>
+					<h3><img src="resources/icons/twitter.png" class="icon" />@RomainMonceau</h3>
+					<h3>25 years old</h3>
+					<h3>+15 years PHP</h3>
+					<h3>Lead Developer @Akeneo <img src="resources/icons/akeneo.png" class="icon" /></h3>
+					<h3>Zytholophile</h3>
 
 					<img src="" />
 				</section>
@@ -82,9 +82,7 @@
 					<h2>PHP n'est pas fait pour faire du batch</h2>
 
 					Attention à la consommation mémoire<br />
-					Comparaison avec le fonctionnement d'autres langages type Java?<br /><br />
-
-					Pagination mémoire limitée à 10k objets<br />
+					Comparaison avec le fonctionnement d'autres langages type Java?<br />
 
 				</section>
 
@@ -170,206 +168,464 @@
 					</section>
 
 					<section>
-						Presentation du Reader
-					</section>
+						<h4>Reader</h4>
+						<pre><code class="php">public function __construct($filepath) {
+    $this->fd = fopen($filepath, 'r+');
+    $this->headers = fgetcsv($this->fd, null, ';');
+}
 
-					<section>
-						Présentation du Processor
-					</section>
+public function read() {
+    $row = fgetcsv($this->fd, null, ';');
+    if (false === $row) {
+        return null;
+    }
+    return array_combine($this->headers, $row);
+}
 
-					<section>
-						Présentation du Writer
-					</section>
-
-				</section>
-
-				<section>
-					Premier test: Import des catégories (150)
-
-					Create - Batch size = 1 - env = dev
-
-					> bin/console batch:import:category /home/romain/workspace/talks/doctrine-batch/data/categories.csv --env=dev
-
-					Memory: 12.58M
-					job - Time: 1.63s - Memory: 18.87M - Diff: 6.29M
-					140 entities created
-
-					Que se passe t-il?
-					- 2 queries par item
-					- plein de transactions
-
-					[2017-11-04 21:53:59] doctrine.DEBUG: SELECT c0_.id AS id_0, c0_.code AS code_1, c0_.name AS name_2, c0_.description AS description_3 FROM category c0_ WHERE c0_.code LIKE 'classic_english_style_pale_ale' [] []
-					[2017-11-04 21:53:59] doctrine.DEBUG: SELECT t0.id AS id_1, t0.code AS code_2, t0.name AS name_3, t0.description AS description_4 FROM category t0 WHERE t0.code = ? ["classic_english_style_pale_ale"] []
-					[2017-11-04 21:53:59] doctrine.DEBUG: "START TRANSACTION" [] []
-					[2017-11-04 21:53:59] doctrine.DEBUG: INSERT INTO category (code, name, description) VALUES (?, ?, ?) {"1":"classic_english_style_pale_ale","2":"Classic English-Style Pale Ale","3":"Pigeon. 'I can hardly brea [...]"} []
-					[2017-11-04 21:53:59] doctrine.DEBUG: "COMMIT" [] []
-
-					Conclusion:
-					Chaque flush est une transaction.
-					Les conseils de doctrine (et même d'une manière générale avec les SGBD) n'est pas de faire plein de transactions.
-					Avec doctrine, il est conseillé de calculer le bon ratio de flush par rapport au nombre d'éléments que vous souhaitez persister.
-					A vous de faire des tests pour trouver ce bon ratio selon vos entités.
-					<aside class="notes">
-						Possibilité de faire un begin transaction tout au début et d'avoir une grande transaction<br />
-						Question à Benoit: J'ai des temps qui vont de 0.7s à 1.92s sur la même exécution... Pourquoi ?<br />
-						Y a t-il une différence entre la création et l'update? En temps d'execution?
-					</aside>
-				</section>
-
-				<section>
-					<section>
-						Second test: Import des catégories (150)
-
-						Create - Batch size = 1000 - env = dev
-
-						> bin/console batch:import:category /home/romain/workspace/talks/doctrine-batch/data/categories.csv --env=dev
-
-						Que se passe t-il?
-						- Erreur de validation
-
-						romain@dandelion:~/workspace/talks/doctrine-batch/demo$ bin/console batch:import:category /home/romain/workspace/talks/doctrine-batch/data/categories.csv --env=dev
-						Memory: 12.58M
-
-						[Doctrine\DBAL\Exception\UniqueConstraintViolationException]
-						An exception occurred while executing 'INSERT INTO category (code, name, description) VALUES (?, ?, ?)' with params ["porter", "Porter", "A second description that seems very cool and better than the previo
-						us one."]:
-
-						SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'porter' for key 'searchunique_idx'
-
-						[Doctrine\DBAL\Driver\PDOException]
-						SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'porter' for key 'searchunique_idx'
-
-						[PDOException]
-						SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'porter' for key 'searchunique_idx'
-
-						TODO: Faire schéma qui explique ce qu'il se passe avec la transaction et pourquoi la validation passe
-
-						<aside class="notes">
-
-						</aside>
-					</section>
-
-					<section>
-						Creation d'un validateur un peu différent. Montrer l'exemple.
-
-						romain@dandelion:~/workspace/talks/doctrine-batch/demo$ bin/console batch:import:category /home/romain/workspace/talks/doctrine-batch/data/categories.csv --env=dev
-						Memory: 12.58M
-						Entity "porter" not valid: The value "porter" is already set in another entity
-						139 entity written
-						job - Time: 0.29s - Memory: 18.87M - Diff: 6.29M
-
+public function __destruct() {
+    fclose($this->fd);
+}</code></pre>
 
 						<aside class="notes"></aside>
 					</section>
+
+					<section>
+						<h4>Processor</h4>
+						<pre><code class="php">$category = $this->findOrCreateCategory($item['code']);
+$category->setName($item['name']);
+$category->setDescription($item['description']);
+
+return $category;</code></pre>
+					</section>
+
+					<section>
+						<h4>Writer</h4>
+
+						<pre><code class="php">$writeCount = 0;
+foreach ($items as $item) {
+    $violations = $this->validator->validate($item);
+    if ($violations->count() === 0) {
+        $this->em->persist($item);
+        $writeCount++;
+    } else {
+        foreach ($violations as $violation) {
+            CommandLogger::error(...);
+        }
+    }
+}
+
+$this->em->flush();</code></pre>
+					</section>
 				</section>
 
 				<section>
 					<section>
-						<h2>Troisième test: Tracking policy</h2>
+						<h4>Import breweries (500 lines)</h4>
 
-						Update des catégories (same environment than previously. Juste changemnt de fichier)
+						<pre><code class="bash">> bin/console batch:import:brewery breweries.csv
+Start: Memory: 12.58M
+End: Time: 25.77s - Memory: 29.36M - Diff: 16.78M</code></pre>
 
-						Update - Batch size = 1000 - env = dev
-
-						> bin/console batch:import:category /home/romain/workspace/talks/doctrine-batch/data/categories_update.csv --env=dev
-
-						Que se passe t-il?
-						La validation a bien lieu est remonté, l'objet n'est pas persisté. Mais un update est quand même envoyé.
-
-						Memory: 12.58M
-						Entity "classic_english_style_pale_ale" not valid: This value is too long. It should have 100 characters or less.
-						0 entity written
-
-
-						[Doctrine\DBAL\Exception\DriverException]
-						An exception occurred while executing 'UPDATE category SET name = ? WHERE id = ?' with params ["Classic English-Style Pale Ale - Pigeon. 'I can hardly breathe.' 'I can't go no lower,' said the Cat. '--so.",
-						1]:
-
-						SQLSTATE[22001]: String data, right truncated: 1406 Data too long for column 'name' at row 1
-
-
-
-						[Doctrine\DBAL\Driver\PDOException]
-						SQLSTATE[22001]: String data, right truncated: 1406 Data too long for column 'name' at row 1
-
-
-
-						[PDOException]
-						SQLSTATE[22001]: String data, right truncated: 1406 Data too long for column 'name' at row 1
+						<pre><code class="bash">> bin/console batch:import:brewery breweries.csv --env=prod
+Start: Memory: 10.49M
+End: Time: 22.2s - Memory: 20.97M - Diff: 10.48M</code></pre>
 
 						<aside class="notes">
-							It tooks a long time to understand what happened.<br />
+							Take care! By default, commands are launched in dev environment!!!<br />
+							Dev environment<br />
 						</aside>
 					</section>
 
 					<section>
-						<h2>Change Tracking policies</h2>
+						<h4>What is happening?</h4>
+
+						<pre><code class="sql">DEBUG: "START TRANSACTION" [] []
+DEBUG: INSERT INTO brewery [...] []
+DEBUG: "COMMIT" [] []
+DEBUG: SELECT [...] FROM brewery b0_ WHERE b0_.code LIKE 'omnis-sed'
+DEBUG: SELECT [...] FROM brewery t0 WHERE t0.code = ? ["omnis-sed"]
+DEBUG: "START TRANSACTION" [] []
+DEBUG: INSERT INTO brewery [...] []
+DEBUG: "COMMIT" [] []</code></pre>
+
+
+						<aside class="notes">
+							- 2 queries per item<br />
+							- lot of transactions (1 per item)<br />
+							Doctrine advices (and SGBD) is to flush sooner<br />
+							Calculate the right ratio item per flush (You need to test)<br />
+						</aside>
+					</section>
+
+					<section>
+						<h4>Step 1: Batch size 100</h4>
+
+						<pre><code class="bash">[Doctrine\DBAL\Exception\UniqueConstraintViolationException]
+[Doctrine\DBAL\Driver\PDOException]
+[PDOException]
+SQLSTATE[23000]: Integrity constraint violation:
+1062 Duplicate entry 'id-quia' for key 'searchunique_idx'</code></pre>
+
+						<aside class="notes">
+							Possibilité de faire un begin transaction tout au début et d'avoir une grande transaction<br />
+						</aside>
+					</section>
+
+					<section>
+						Explain what happens with a schema :)<br />
+						1 schéma avant<br />
+						1 schéma après
+
+					</section>
+
+					<section>
+						<h4>Step 2: Create validator</h4>
+
+						<pre><code class="php">class UniqueEntityCodeValidator extends ConstraintValidator {
+  private $codeSet = [];
+
+  public function validate($entity, Constraint $constraint) {
+    if (isset($this->codeSet[$entity->getCode()])) {
+      $this->context
+        ->buildViolation($constraint->message)
+        ->setParameter('%unique_code%', $entity->getCode())
+        ->addViolation();
+
+      return;
+    }
+    $this->codeSet[$entity->getCode()] = $entity->getCode();
+  }
+}</code></pre>
+
+					</section>
+
+					<section>
+						<h4>Relaunch the import now!</h4>
+						<pre><code class="bash">Start: Memory: 10.49M
+Entity "id-quia" not valid:
+  The value "id-quia" is already set in another entity
+1000 entity written
+End: Time: 1.79s - Memory: 20.97M - Diff: 10.48M</code></pre>
+
+						Previous results:
+						<pre><code class="bash">Start: Memory: 10.49M
+1001 entity written
+End: Time: 22.2s - Memory: 20.97M - Diff: 10.48M</code></pre>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h4>Step 3: Update breweries</h4>
+
+						Autre fichier avec 1 ligne<br />
+						This file contains a name longer than expected<br />
+
+						<pre><code class="bash">bin/console batch:import:brewery breweries_update.csv --env=prod
+Memory: 10.49M
+Entity "id-quia" not valid: This value is too long.
+  It should have 100 characters or less.
+0 entity written
+
+[Doctrine\DBAL\Exception\DriverException]
+[Doctrine\DBAL\Driver\PDOException]
+[PDOException]
+  SQLSTATE[22001]: String data, right truncated:
+    1406 Data too long for column 'name' at row 1</code></pre>
+
+						<aside class="notes">
+							La validation a bien lieu est remonté, l'objet n'est pas persisté. Mais un update est quand même envoyé.<br />
+							Celui a pris du temps à être compris<br />
+						</aside>
+					</section>
+
+					<section>
+						<h4>What about the writer</h4>
+
+						Schéma step 3
+
+						<aside class="notes">
+							Explication du schéma<br />
+							2 façons de faire pour corriger ce problème.<br />
+							Détacher mon entity de l'UOW afin qu'elle ne soit pas prise en compte (souvent coûteux en temps de le faire ligne par ligne
+						</aside>
+
+					</section>
+
+					<section>
+						<h4>Change Tracking Policy</h4>
+
+						http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/change-tracking-policies.html
 
 						<blockquote>
 							"It is the process of determining what has changed in managed entities since the last time they were synchronized with the db"
 						</blockquote>
 
-						It could be define per entity.<br />
+						<ul>
+							<li>Deferred implicit (default)</li>
+							<li>Deferred explicit</li>
+							<li>Notify</li>
+						</ul>
 
-						Deferred Implicit (default): Doctrine detects the changes by a property-by property comparison at commit time. EntityManager::flush(); everything
-						Deferred Explicit: Same but need to call explicitely EntityManager::persist . More efficient than the implicit.
-						Notify: You need to implement by yourself the changes using listeners. It's far more efficient.
-
-
-						<aside class="notes">
-							http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/change-tracking-policies.html<br />
-							Plusieurs solutions. Detach could be one.
+						<aside class="notes">Defined per entity<br />
+							Implicit: Doctrine detects the change by a property-by property comparison at commit time. EntityManager::flush(); everything<br />
+							Explicit: Same but need to call explicitely EntityManager::persist(). More efficient ;)<br />
+							Notify: You need to implement by yourself the changes using listeners. It's far more efficient.
 						</aside>
 					</section>
 
 					<section>
-						Change tracking policy
-						<pre><code class="yml">
-BeerBundle\Entity\Category:
+						<h4>Deferred explicit implementation</h4>
+
+						<pre><code class="yml">BeerBundle\Entity\Brewery:
   type: entity
-  table: category
+  table: brewery
   repositoryClass: BeerBundle\Entity\Repository\EntityRepository
-  changeTrackingPolicy: DEFERRED_EXPLICIT
-						</code></pre>
+  changeTrackingPolicy: DEFERRED_EXPLICIT</code></pre>
+
+						<aside class="notes">
+							Plus explicite (comme son nom l'indique)<br />
+							Plus efficace car Doctrine ne va checker les diff que sur ce qu'on lui a dit de persister<br />
+							Cela résoud le problème fonctionnel mais il ne résoud pas réellement le problème de scalabilité mais nous verrons ça un peu plus tard.<br />
+							La réponse à la scalabilité est de détacher cet objet de l'UOW<br />
+							Je trouvais important de vous présenter ce fonctionnement pour mieux comprendre doctrine<br />
+						</aside>
+
 					</section>
 				</section>
 
 				<section>
-					Import des brasseries (50000)
+					<section>
+						<h4>Import beers (10000 lines)</h4>
 
-					romain@dandelion:~/workspace/talks/doctrine-batch/demo$ bin/console batch:import:brewery /home/romain/workspace/talks/doctrine-batch/data/brewery.csv --env=dev
-					DEV: job - Time: 335.01s - Memory: 611.6M - Diff: 599.02M
-					PROD: job - Time: 67.73s - Memory: 334.76M - Diff: 324.27M
+						<pre><code class="bash">bin/console batch:import:beer beers_10k.csv --env=prod
+Start: Memory: 10.49M
+10000 entity written
+End: Time: 20.18s - Memory: 92.27M - Diff: 81.78M</code></pre>
 
-					Faire graphique avec la consommation mémoire tous les 1000 insertions
+						Faire graphique avec la consommation mémoire tous les 1000 insertions
+
+						Memory: 10.49M
+						Time: 2.47s - Memory: 25.17M - Diff: 14.68M
+						Time: 2.27s - Memory: 33.55M - Diff: 8.38M
+						Time: 1.96s - Memory: 41.94M - Diff: 8.39M
+						Time: 1.9s - Memory: 50.33M - Diff: 8.39M
+						Time: 1.98s - Memory: 56.62M - Diff: 6.29M
+						Time: 1.93s - Memory: 62.91M - Diff: 6.29M
+						Time: 1.92s - Memory: 71.3M - Diff: 8.39M
+						Time: 1.93s - Memory: 77.59M - Diff: 6.29M
+						Time: 1.97s - Memory: 85.98M - Diff: 8.39M
+						Time: 1.97s - Memory: 92.27M - Diff: 6.29M
+						Time: 20.31s - Memory: 92.27M
+
+						<aside class="notes">
+						</aside>
+				  </section>
+
+					<section>
+						<h4>Import beers (20000 lines)</h4>
+
+						<pre><code class="bash">bin/console batch:import:beer beers_20k.csv --env=prod
+
+PHP Fatal error:
+  Allowed memory size of 134217728 bytes exhausted
+  (tried to allocate 20480 bytes)</code></pre>
+
+						<aside class="notes">
+							Useless to increase PHP memory limit, it will probably break later when my file will be bigger
+						</aside>
+
+					</section>
+
+					<section>
+						<h4>Explanation memory leak problems</h4>
+
+						Increase memory usage<br />
+						Decrease performance<br />
+
+						GC is run more often and for nothing because it is not able to free memory<br />
+						It leads to an increase of CPU usage of the process<br />
+
+						<aside class="notes">
+							Maybe deep into memory usage and garbage collector in PHP<br />
+							How to free the memory of an object<br />
+							No object duplication<br />
+							It's a link on its address and then a reference counter to know how many time an object is used<br />
+							When object is not used anymore, it could be free<br />
+						</aside>
+					</section>
+
+					<section>
+						<h4>php-meminfo</h4>
+
+						Free & open source PHP extension<br />
+						https://github.com/BitOne/php-meminfo<br />
+						Give insight about PHP memory content<br />
+
+						<aside class="notes">
+							License MIT<br />
+							Its main goal is to help you understand memory leaks: by looking at data present in memory, you can better understand your application behaviour.<br />
+							We will take a look deeper using a PHP extension named php-meminfo<br />
+						</aside>
+
+					</section>
+
+					<section>
+						<h4>php-meminfo: How it works?</h4>
+
+						Dump memory using
+
+						<pre><code class="php">meminfo_info_dump(fopen('/tmp/doctrine_batch.log', 'w'));</code></pre>
+
+						<aside class="notes">Use gc_collect_cycles(); before?</aside>
+					</section>
+
+					<section>
+						<h4>Have summary by object types</h4>
+
+						<pre><code class="bash">$ bin/analyzer summary /tmp/doctrine_batch.log</code></pre>
+
+						<table>
+							<thead>
+							<tr>
+								<td>Type</td>
+								<td>Instances Count</td>
+								<td>Cumulated Self Size (bytes)</td>
+							</tr>
+							</thead>
+							<tbody>
+							<tr><td>BeerBundle\Entity\Brewery</td><td>21000</td><td>1512000</td></tr>
+							<tr><td>BeerBundle\Entity\Category</td><td>20139</td><td>1450008</td></tr>
+							<tr><td>Doctrine\ORM\Query\ResultSetMapping</td><td>11145</td><td>802440</td></tr>
+							<tr><td>Doctrine\ORM\Query\ParserResult</td><td>11139</td><td>802008</td></tr>
+							<tr><td>Doctrine\ORM\Query\Exec\SingleSelectExecutor</td><td>11139</td><td>802008</td></tr>
+							<tr><td>BeerBundle\Entity\Beer</td><td>10000</td><td>720000</td></tr>
+							</tbody>
+						</table>
+
+					</section>
+
+					<section>
+						<h4>Analyze the memory dump for a specific object</h4>
+
+						<pre><code class="bash">bin/analyzer query -f "class=BeerBundle\\Entity\\Beer" -v /tmp/doctrine_batch.log</code></pre>
+
+						<table>
+							<thead>
+							<tr>
+								<td>Item ids</td>
+								<td>Item data</td>
+								<td>Children</td>
+							</tr>
+							</thead>
+							<tbody>
+							<tr>
+								<td>0x7f64ab801028</td>
+								<td>
+									Type: object<br />
+									Class: BeerBundle\Entity\Beer<br />
+									[...]
+								</td>
+								<td>
+									id: 0x7f64a8d354e0<br />
+									code: 0x7f64a8d35500<br />
+									[...]<br />
+									brewery: 0x7f64a8d355a0<br />
+									category: 0x7f64a8d355c0
+								</td>
+							</tr>
+							</tbody>
+						</table>
+
+					</section>
+
+					<section>
+						<h4>Analyze the memory path</h4>
+
+						<pre><code class="bash">bin/analyzer ref-path /tmp/doctrine_batch.log 0x7f64ab801028
+Found 3 paths</code></pre>
+
+						<div>First path</div>
+						Path from 0x7f64be256280
+						0x7f64ab801028
+						^
+						|
+						1 (0x7f64afa4a920)
+						^
+						|
+						BeerBundle\Entity\Beer (0x7f64a8c65c80)
+						^
+						|
+						identityMap(0x7f64a8c6d320)
+						^
+						|
+						unitOfWork (0x7f64afdbe7c0)
+						^
+						|
+						doctrine.orm.default_entity_manager (0x7f64af9c08e0)
+						^
+						|
+						services (0x7f64af9c1280)
+						^
+						|
+						container (0x7f64be256280)
+
+						<aside class="notes">Pourquoi est-ce que l'objet tout en haut n'est pas celui que je recherche?</aside>
+
+					</section>
+
+					<section>
+						<h4>Deep into the UOW</h4>
+
+						<pre><code class="php">$this->identityMap[$className][$idHash] = $entity;</code></pre>
+
+						This array stores a map between id and entiy.<br />
+						It allows to fetch from its identifier an entity that is already in the UOW and avoid a new SQL query<br />
+
+						<pre><code class="php">$this->entityState[spl_object_hash($entity)];</code></pre>
+						This array stores the status of your entity.<br />
+						4 status: Managed, New, Detached or Removed<br />
 
 
+						<aside class="notes">
+							Cache niveau 2 pour identityMap?<br/>
+							See doctrine website on entity status to add content
+						</aside>
 
-					<aside class="notes"></aside>
-				</section>
+					</section>
 
-				<section>
-					Import des bières (100000)
+					<section>
+						<h4>Detach versus clear</h4>
 
+						3 ways to detach everything
+						-> $em->detach($entity); // Detach an entity from the UOW. Does not remove updateCollections, removeCollections, etc. done by commit()
+						-> $em->clear(get_class($entity)); // Detach all entity of the class from the UOW. Does not remove updateCollections, etc. done by commit()
+						-> $em->clear(); // Clear the UOW.
 
-
+						Of course detach and clear(class) also calls cascade detach
+					</section>
 				</section>
 
 				<section>
 					<h2>Sujets à aborder</h2>
 
-					- Env dev ou prod
-					- Memory limit
-					- Detach vs clear
+					- Detach vs clear($entityName) vs clear
 					- ResultMapping & DQL queries
-
 				</section>
 
+				<section>
+					<h4>Export</h4>
+
+					1. findAll()
+					2. findById() + limit
+					3. iterate() method
+
+
+				</section>
 
 				<section>
 					<h2>What's next?</h2>
 
-					Export?
 					Multi import? (beers + breweries) -> Quick presentation
 					Improve performance? (test "Change tracking policy" -> notify)
 					Mass Delete?
