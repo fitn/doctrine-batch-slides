@@ -82,7 +82,7 @@
 
             Timeout<br />
 
-            Attention à la consommation mémoire<br />
+            Take care at memory consumption
             <aside class="notes">Comparaison avec le fonctionnement d'autres langages type Java?</aside>
 
           </section>
@@ -96,9 +96,15 @@
 
         <section>
           <section>
-            <h2>Présentation du model</h2>
+            <h2>Model presentation</h2>
 
             <img src="resources/img/doctrine_example_model.png" />
+
+	          <aside class="notes">
+		          Code unique<br />
+		          Explain what is for!<br />
+		          Relation manyToOne unidirectional from Beer entity<br />
+	          </aside>
           </section>
           <section>
             <h4>Doctrine mapping: Beer.orm.yml</h4>
@@ -141,27 +147,6 @@
         name: category_id
         referencedColumnName: id
             </code></pre>
-          </section>
-
-          <section>
-            <h4>Dedicated repository</h4>
-
-            <pre><code class="php">public function findOneByIdentifier(string $code) {
-    $qb = $this->createQueryBuilder('c');
-    $qb->andWhere(
-        $qb->expr()->like('c.code', $qb->expr()->literal($code))
-    );
-
-
-    $results = $qb->getQuery()->execute();
-
-    $count = count($results);
-    if ($count !== 1) {
-        return null;
-    }
-
-    return $results[0];
-}</code></pre>
           </section>
         </section>
 
@@ -277,8 +262,8 @@ Start: Memory: 10.49M
 End: Time: 22.2s - Memory: 20.97M - Diff: 10.48M</code></pre>
 
             <aside class="notes">
+	            By default, batch size = 1<br />
               Take care! By default, commands are launched in dev environment!!!<br />
-              Dev environment<br />
             </aside>
           </section>
 
@@ -300,32 +285,43 @@ DEBUG: "COMMIT" [] []</code></pre>
               - lot of transactions (1 per item)<br />
               Doctrine advices (and SGBD) is to flush sooner<br />
               Calculate the right ratio item per flush (You need to test)<br />
+	            Possibilité de faire un begin transaction tout au début et d'avoir une grande transaction<br />
             </aside>
           </section>
 
           <section>
-            <h4>Step 1: Batch size 100</h4>
+            <h4>Increase batch size to 100</h4>
 
-            <pre><code class="bash">[Doctrine\DBAL\Exception\UniqueConstraintViolationException]
+            <pre class="fragment"><code class="bash">[Doctrine\DBAL\Exception\UniqueConstraintViolationException]
 [Doctrine\DBAL\Driver\PDOException]
 [PDOException]
 SQLSTATE[23000]: Integrity constraint violation:
 1062 Duplicate entry 'id-quia' for key 'searchunique_idx'</code></pre>
 
             <aside class="notes">
-              Possibilité de faire un begin transaction tout au début et d'avoir une grande transaction<br />
+	            I relaunch the same import<br />
+	            2 times the same code in my file<br />
             </aside>
           </section>
 
           <section>
-            Explain what happens with a schema :)<br />
-            1 schéma avant<br />
-            1 schéma après
+	          <h4>Validation process: batch size 1</h4>
 
+	          <img src="resources/img/doctrine_step1_batch_size1.png" />
           </section>
 
+	        <section>
+		        <h4>Validation process: batch size 100</h4>
+
+		        <img src="resources/img/doctrine_step1_batch_size100.png" />
+
+		        <aside class="notes">
+			        Think about another way for validators!!!
+		        </aside>
+	        </section>
+
           <section>
-            <h4>Step 2: Create validator</h4>
+            <h4>Create validator</h4>
 
             <pre><code class="php">class UniqueEntityCodeValidator extends ConstraintValidator {
   private $codeSet = [];
@@ -342,7 +338,6 @@ SQLSTATE[23000]: Integrity constraint violation:
     $this->codeSet[$entity->getCode()] = $entity->getCode();
   }
 }</code></pre>
-
           </section>
 
           <section>
@@ -353,7 +348,7 @@ Entity "id-quia" not valid:
 1000 entity written
 End: Time: 1.79s - Memory: 20.97M - Diff: 10.48M</code></pre>
 
-            Previous results:
+	          <h5>Previous results</h5>
             <pre><code class="bash">Start: Memory: 10.49M
 1001 entity written
 End: Time: 22.2s - Memory: 20.97M - Diff: 10.48M</code></pre>
@@ -362,9 +357,9 @@ End: Time: 22.2s - Memory: 20.97M - Diff: 10.48M</code></pre>
 
         <section>
           <section>
-            <h4>Step 3: Update breweries</h4>
+            <h4>Update breweries</h4>
 
-            Autre fichier avec 1 ligne<br />
+            Another file with 1 line<br />
             This file contains a name longer than expected<br />
 
             <pre><code class="bash">bin/console batch:import:brewery breweries_update.csv --env=prod
@@ -380,15 +375,16 @@ Entity "id-quia" not valid: This value is too long.
     1406 Data too long for column 'name' at row 1</code></pre>
 
             <aside class="notes">
-              La validation a bien lieu est remonté, l'objet n'est pas persisté. Mais un update est quand même envoyé.<br />
-              Celui a pris du temps à être compris<br />
+              La validation a bien lieu est remonté, l'objet n'est pas persisté.<br />
+	            Mais un update est quand même envoyé.<br />
+              Celui-ci a pris du temps à être compris<br />
             </aside>
           </section>
 
           <section>
-            <h4>What about the writer</h4>
+            <h4>What happens?!</h4>
 
-            Schéma step 3
+            <img src="resources/img/doctrine_batch_schema_step_3.png" />
 
             <aside class="notes">
               Explication du schéma<br />
@@ -401,8 +397,6 @@ Entity "id-quia" not valid: This value is too long.
           <section>
             <h4>Change Tracking Policy</h4>
 
-            http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/change-tracking-policies.html
-
             <blockquote>
               "It is the process of determining what has changed in managed entities since the last time they were synchronized with the db"
             </blockquote>
@@ -414,6 +408,7 @@ Entity "id-quia" not valid: This value is too long.
             </ul>
 
             <aside class="notes">Defined per entity<br />
+	            http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/change-tracking-policies.html<br />
               Implicit: Doctrine detects the change by a property-by property comparison at commit time. EntityManager::flush(); everything<br />
               Explicit: Same but need to call explicitely EntityManager::persist(). More efficient ;)<br />
               Notify: You need to implement by yourself the changes using listeners. It's far more efficient.
@@ -606,33 +601,22 @@ PHP Fatal error:
             <h4>Analyze the memory path</h4>
 
             <pre><code class="bash">bin/analyzer ref-path /tmp/doctrine_batch.log 0x7f64ab801028
-Found 3 paths</code></pre>
-
-            <div>First path</div>
-            Path from 0x7f64be256280
-            0x7f64ab801028
-            ^
-            |
-            1 (0x7f64afa4a920)
-            ^
-            |
-            BeerBundle\Entity\Beer (0x7f64a8c65c80)
-            ^
-            |
-            identityMap (0x7f64a8c6d320)
-            ^
-            |
-            unitOfWork (0x7f64afdbe7c0)
-            ^
-            |
-            doctrine.orm.default_entity_manager (0x7f64af9c08e0)
-            ^
-            |
-            services (0x7f64af9c1280)
-            ^
-            |
-            container (0x7f64be256280)
-
+Found 3 paths
+0x7f64ab801028
+^
+1 (0x7f64afa4a920)
+^
+BeerBundle\Entity\Beer (0x7f64a8c65c80)
+^
+identityMap (0x7f64a8c6d320)
+^
+unitOfWork (0x7f64afdbe7c0)
+^
+doctrine.orm.default_entity_manager (0x7f64af9c08e0)
+^
+services (0x7f64af9c1280)
+^
+container (0x7f64be256280)</code></pre>
             <aside class="notes">Pourquoi est-ce que l'objet tout en haut n'est pas celui que je recherche?</aside>
 
           </section>
@@ -768,29 +752,142 @@ End: Time: 20.52s - Memory: 67.11M - Diff: 54.53M</code></pre>
               2M less than previous execution<br />
               No more Brewery nor Category<br />
               Not necessary to clear the whole UOW in this case<br />
+	            10000 beers + 1000 breweries + 139 categories
             </aside>
           </section>
 
+	        <section>
+		        <h4>Let's hunt last memory leaks</h4>
 
-	        
+		        <ul>
+			        <li>SingleSelectExecutor: Executes SQL statement from DQL select statement</li>
+			        <li>ResultSetMapping: Maps results set of SQL query to Doctrine results</li>
+			        <li>ParserResult: Encapsulates results from DQL parsing</li>
+		        </ul>
+	        </section>
 
-        </section>
+	        <section>
+		        <h4>Let's hunt last memory leaks</h4>
 
-        <section>
-          <h2>Sujets à aborder</h2>
+		        Analyze the memory with php-meminfo:
 
-          - Detach vs clear($entityName) vs clear
-          - ResultMapping & DQL queries
+		        <pre><code>Path from 0x7fa5eaa56280
+0x7fa5d8f14c00
+^
+_resultSetMapping (0x7fa5dc2af5c8)
+^
+0 (0x7fa5d9a11000)
+^
+sf_orm_default_a1536898803dafe5169a1bd008aad667f3b84c092cc24b9f4a3483342a35e6d6[72581bcf67100f31f4179c031c0fa291][1] (0x7fa5d8ee45e0)
+^
+data (0x7fa5dc5b9b00)
+^
+doctrine_cache.providers.doctrine.orm.default_query_cache (0x7fa5dc1d3060)
+^
+services (0x7fa5dc1d3780)
+^
+container (0x7fa5eaa56280)</code></pre>
+
+		        Object linked to ORM\Query
+
+	        </section>
+
+	        <section>
+		        <h4>Dedicated repository</h4>
+
+		        <pre><code class="php">public function findOneByIdentifier(string $code) {
+    $qb = $this->createQueryBuilder('c');
+    $qb->andWhere(
+        $qb->expr()->like('c.code', $qb->expr()->literal($code))
+    );
+
+
+    $results = $qb->getQuery()->execute();
+
+    $count = count($results);
+    if ($count !== 1) {
+        return null;
+    }
+
+    return $results[0];
+}</code></pre>
+	        </section>
+
+	        <section>
+		        <h4>How to query entities?!</h4>
+
+		        <pre><code class="php">$qb = $this->createQueryBuilder('c');
+$qb->andWhere(
+  $qb->expr()->like('c.code', $qb->expr()->literal($code))
+);
+
+$results = $qb->getQuery()->execute();</code></pre>
+
+		        <pre class="fragment"><code class="php">public function createQueryBuilder() {
+  return new QueryBuilder($this);
+}</code></pre>
+
+		        <pre class="fragment"><code class="php">public function getQuery() {
+  $parameters = clone $this->parameters;
+  $query = $this->_em->createQuery($this->getDQL())
+        ...
+}</code></pre>
+
+		        <pre class="fragment"><code class="php">public function createQuery($dql = '') {
+    $query = new Query($this);
+
+    return $query;
+}</code></pre>
+	        </section>
+
+	        <section>
+		        <h4>How to query entities?!</h4>
+
+		        <pre><code class="php">$qb = $this->createQueryBuilder('c');
+$qb->andWhere(
+  $qb->expr()->like('c.code', ':code')
+);
+$qb->setParameter('code', $code);
+
+$results = $qb->getQuery()->execute();</code></pre>
+
+		        <pre><code class="bash">bin/console batch:import:beer --env=prod
+End: Time: 17.35s - Memory: 16.78M - Diff: 6.29M</code></pre>
+
+		        <aside class="notes">
+			        No more memory leak at this point!
+		        </aside>
+	        </section>
+
+	        <section>
+		        <h4>How to query entities?!</h4>
+
+		        <pre><code class="php">public function findOneByIdentifier(string $code) {
+    return $this->findOneBy(['code' => $code]);
+}</code></pre>
+		        <ul>
+			        <li>Uses BasicEntityPersister</li>
+			        <li>Only work on a single table</li>
+		        </ul>
+
+		        <pre><code class="bash">bin/console batch:import:beer --env=prod
+End: Time: 14.38s - Memory: 14.68M - Diff: 3.89M</code></pre>
+
+		        <aside class="notes">
+			        Persister instead of create DQL queries<br />
+			        Far more efficient<br />
+			        More about performance
+		        </aside>
+	        </section>
+
         </section>
 
         <section>
           <h4>Export</h4>
 
-          1. findAll()
-          2. findById() + limit
-          3. iterate() method
-
-
+          1. findAll()<br />
+          2. findById() + limit<br />
+          3. iterate() method<br />
         </section>
 
         <section>
