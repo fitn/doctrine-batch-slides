@@ -1,107 +1,109 @@
 <!doctype html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<title>reveal.js</title>
+    <title>reveal.js</title>
 
-		<link rel="stylesheet" href="css/reveal.css">
-		<link rel="stylesheet" href="css/theme/league.css">
+    <link rel="stylesheet" href="css/reveal.css">
+    <link rel="stylesheet" href="css/theme/league.css">
 
-		<link rel="stylesheet" href="css/fitn.css">
+    <link rel="stylesheet" href="css/fitn.css">
 
-		<!-- Theme used for syntax highlighting of code -->
-		<link rel="stylesheet" href="lib/css/zenburn.css">
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="lib/css/zenburn.css">
 
-		<!-- Printing and PDF exports -->
-		<script>
-			var link = document.createElement( 'link' );
-			link.rel = 'stylesheet';
-			link.type = 'text/css';
-			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
-			document.getElementsByTagName( 'head' )[0].appendChild( link );
-		</script>
-	</head>
-	<body>
-		<div class="reveal">
-			<div class="slides">
-
-
-				<section>
-					<h2>The worst best idea: Doing batch with PHP and Doctrine</h2>
-					<img src="" />
-
-					<aside class="notes">
-						Pourquoi ce sujet ?<br />
-						PHP n'est pas fait pour le batch<br />
-						Doctrine n'est pas fait pour ça non plus<br />
-						Le but n'est pas de critiquer Doctrine ou de vous donner envie de l'utiliser<br />
-						Réutiliser votre stack permet de garder vos entités, validateurs, events, queries, etc.<br />
-						Réel retour d'XP sur des problèmes rencontrés<br />
-						J'espère que ce retour vous apprendra quelques astuces et pourra vous aider<br />
-					</aside>
-				</section>
-
-				<section>
-					<h2>Romain Monceau</h2>
-					<h3><img src="resources/icons/twitter.png" class="icon" />@RomainMonceau</h3>
-					<h3>25 years old</h3>
-					<h3>+15 years PHP</h3>
-					<h3>Lead Developer @Akeneo <img src="resources/icons/akeneo.png" class="icon" /></h3>
-					<h3>Zytholophile</h3>
-
-					<img src="" />
-				</section>
-
-				<section>
-					<h2><Site web</h2>
-
-					<ul>
-						<li>PHP 7</li>
-						<li>MySQL</li>
-						<li>Symfony 3.3</li>
-						<li>Doctrine</li>
-					</ul>
-					<aside class="notes">
-						Super site web qui recense toutes les bières, toutes les brasseries avec des commentaires des internautes !<br />
-						Une fois le site prêt, je me suis rendu compte qu'il allait falloir que j'importe tout un tas de données.<br />
-
-					</aside>
-				</section>
-
-				<section>
-					Slide Coluche?
-
-					<blockquote>Toute relation avec des projets existants ou ayant existés étant absolument fait exprès</blockquote>
-				</section>
+    <!-- Printing and PDF exports -->
+    <script>
+      var link = document.createElement( 'link' );
+      link.rel = 'stylesheet';
+      link.type = 'text/css';
+      link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+      document.getElementsByTagName( 'head' )[0].appendChild( link );
+    </script>
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
 
 
+        <section>
+          <h2>The worst best idea: Doing batch with PHP and Doctrine</h2>
+          <img src="" />
 
-				<section>
-					<h2>PHP n'est pas fait pour faire du batch</h2>
+          <aside class="notes">
+            Pourquoi ce sujet ?<br />
+            PHP n'est pas fait pour le batch<br />
+            Doctrine n'est pas fait pour ça non plus<br />
+            Le but n'est pas de critiquer Doctrine ou de vous donner envie de l'utiliser<br />
+            Réutiliser votre stack permet de garder vos entités, validateurs, events, queries, etc.<br />
+            Réel retour d'XP sur des problèmes rencontrés<br />
+            J'espère que ce retour vous apprendra quelques astuces et pourra vous aider<br />
+          </aside>
+        </section>
 
-					Attention à la consommation mémoire<br />
-					Comparaison avec le fonctionnement d'autres langages type Java?<br />
+        <section>
+          <div class="left">
+            <img src="resources/me.jpg" />
+          </div>
+          <div class="right">
+            <h2>Romain Monceau</h2>
+            <ul>
+              <li><img src="resources/icons/twitter.png" class="icon" />@RomainMonceau</li>
+              <li>25 years old</li>
+              <li>+15 years PHP</li>
+              <li>Lead Developer @Akeneo <img src="resources/icons/akeneo.png" class="icon" /></li>
+              <li>Beer is life!!</li>
+            </ul>
+          </div>
+        </section>
 
-				</section>
+        <section data-background="resources/pictures/background-beers.jpg">
+          <h2>Site web</h2>
+          <ul>
+            <li>PHP 7</li>
+            <li>MySQL</li>
+            <li>Symfony 3.3</li>
+            <li>Doctrine</li>
+          </ul>
+          <aside class="notes">
+            Super site web qui recense toutes les bières, toutes les brasseries avec des commentaires des internautes !<br />
+            Une fois le site prêt, je me suis rendu compte qu'il allait falloir que j'importe tout un tas de données.<br />
+            Toute relation avec des projets existants ou ayant existés étant absolument fait exprès
+          </aside>
+        </section>
 
-				<section>
-					<h2>Doctrine n'est pas fait pour le batch</h2>
+        <section>
+          <section>
+            <h2>PHP n'est pas fait pour faire du batch</h2>
 
-					<img src="resources/img/doctrine_batch_doc.png" />
-				</section>
+            Requête HTTP<br />
 
-				<section>
-					<section>
-						<h2>Présentation du model</h2>
+            Timeout<br />
 
-						<img src="resources/img/doctrine_example_model.png" />
-					</section>
-					<section>
-						<h4>Doctrine mapping: Beer.orm.yml</h4>
+            Attention à la consommation mémoire<br />
+            <aside class="notes">Comparaison avec le fonctionnement d'autres langages type Java?</aside>
 
-						<pre><code class="yml">BeerBundle\Entity\Beer:
+          </section>
+
+          <section>
+            <h2>Doctrine n'est pas fait pour le batch</h2>
+
+            <img src="resources/img/doctrine_batch_doc.png" />
+          </section>
+        </section>
+
+        <section>
+          <section>
+            <h2>Présentation du model</h2>
+
+            <img src="resources/img/doctrine_example_model.png" />
+          </section>
+          <section>
+            <h4>Doctrine mapping: Beer.orm.yml</h4>
+
+            <pre><code class="yml">BeerBundle\Entity\Beer:
   type: entity
   table: beer
   fields:
@@ -118,13 +120,13 @@
     quotation:
       [...]</code></pre>
 
-						<aside class="notes">Just a specific repository class to search entity from code</aside>
-					</section>
+            <aside class="notes">Just a specific repository class to search entity from code</aside>
+          </section>
 
-					<section>
-						<h4>Doctrine mapping: Beer.orm.yml</h4>
+          <section>
+            <h4>Doctrine mapping: Beer.orm.yml</h4>
 
-						<pre><code class="yml">BeerBundle\Entity\Beer:
+            <pre><code class="yml">BeerBundle\Entity\Beer:
   type: entity
   table: beer
   manyToOne:
@@ -138,38 +140,70 @@
       joinColumn:
         name: category_id
         referencedColumnName: id
-						</code></pre>
-					</section>
-				</section>
+            </code></pre>
+          </section>
 
-				<section>
+          <section>
+            <h4>Dedicated repository</h4>
 
-					<section>
-						<h2>How doing batch?</h2>
+            <pre><code class="php">public function findOneByIdentifier(string $code) {
+    $qb = $this->createQueryBuilder('c');
+    $qb->andWhere(
+        $qb->expr()->like('c.code', $qb->expr()->literal($code))
+    );
 
-						Développer cette présentation générale!
 
-						1 entity à la fois
+    $results = $qb->getQuery()->execute();
 
-						<aside class="notes">
-							Stack maison largement inspiré d'Akeneo batch qui est un portage de Spring Batch (Java) en PHP<br />
-							Ca se présente globalement comme un ETL (Extract / Transform / Load)<br />
-						</aside>
-					</section>
+    $count = count($results);
+    if ($count !== 1) {
+        return null;
+    }
 
-					<section>
-						Add schéma Reader / Processor / Writer
+    return $results[0];
+}</code></pre>
+          </section>
+        </section>
 
-						First big difference, flush is done by batch. Otherwise, it's done unitary
-					</section>
+        <section>
 
-					<section>
-						Presentation du Job
-					</section>
+          <section>
+            <h2>How doing batch?</h2>
 
-					<section>
-						<h4>Reader</h4>
-						<pre><code class="php">public function __construct($filepath) {
+            <img src="resources/img/diagram-batch-job.svg" />
+
+            <aside class="notes">
+              Ca se présente globalement comme un ETL (Extract / Transform / Load)<br />
+              Stack maison largement inspiré d'Akeneo batch qui est un portage de Spring Batch (Java) en PHP<br />
+            </aside>
+          </section>
+
+          <section>
+            <h4>Job implementation</h4>
+
+            <pre><code class="php">public function execute() {
+    while (!$stopExecution) {
+        $readItem = $this->reader->read();
+        if (null === $readItem) {
+            $stopExecution = true; continue;
+        }
+
+        $processedItem = $this->processor->process($readItem);
+
+        if (null !== $processedItem) {
+            $itemsToWrite[] = $processedItem; $writeCount++;
+            if (0 === $writeCount % $this->batchSize) {
+                $this->writer->write($itemsToWrite);
+                $itemsToWrite = [];
+            }
+        }
+    }
+}</code></pre>
+          </section>
+
+          <section>
+            <h4>Reader</h4>
+            <pre><code class="php">public function __construct($filepath) {
     $this->fd = fopen($filepath, 'r+');
     $this->headers = fgetcsv($this->fd, null, ';');
 }
@@ -185,61 +219,74 @@ public function read() {
 public function __destruct() {
     fclose($this->fd);
 }</code></pre>
+          </section>
 
-						<aside class="notes"></aside>
-					</section>
+          <section>
+            <h4>Processor</h4>
+            <pre><code class="php">public function process($item) {
+    $category = $this->findOrCreateCategory($item['code']);
+    $category->setName($item['name']);
+    $category->setDescription($item['description']);
 
-					<section>
-						<h4>Processor</h4>
-						<pre><code class="php">$category = $this->findOrCreateCategory($item['code']);
-$category->setName($item['name']);
-$category->setDescription($item['description']);
-
-return $category;</code></pre>
-					</section>
-
-					<section>
-						<h4>Writer</h4>
-
-						<pre><code class="php">$writeCount = 0;
-foreach ($items as $item) {
-    $violations = $this->validator->validate($item);
-    if ($violations->count() === 0) {
-        $this->em->persist($item);
-        $writeCount++;
-    } else {
-        foreach ($violations as $violation) {
-            CommandLogger::error(...);
-        }
-    }
+    return $category;
 }
 
-$this->em->flush();</code></pre>
-					</section>
-				</section>
+public function findOrCreateCategory(string $code) {
+    $entity = $this->repository->findOneByIdentifier($code);
+    if (null === $entity) {
+        $entity = new Category();
+        $entity->setCode($code);
+    }
 
-				<section>
-					<section>
-						<h4>Import breweries (500 lines)</h4>
+    return $entity;
+}</code></pre>
+          </section>
 
-						<pre><code class="bash">> bin/console batch:import:brewery breweries.csv
+          <section>
+            <h4>Writer</h4>
+
+            <pre><code class="php">public function write(array $items) {
+    $writeCount = 0;
+    foreach ($items as $item) {
+        $violations = $this->validator->validate($item);
+        if ($violations->count() === 0) {
+            $this->em->persist($item);
+            $writeCount++;
+        } else {
+            foreach ($violations as $violation) {
+                CommandLogger::error(...);
+            }
+        }
+    }
+
+    $this->em->flush();
+}</code></pre>
+          </section>
+        </section>
+
+        <section>
+          <section>
+            <h4>Import breweries (500 lines)</h4>
+
+            <pre><code class="bash">> bin/console batch:import:brewery breweries.csv
 Start: Memory: 12.58M
 End: Time: 25.77s - Memory: 29.36M - Diff: 16.78M</code></pre>
 
-						<pre><code class="bash">> bin/console batch:import:brewery breweries.csv --env=prod
+            <pre><code class="bash">> bin/console batch:import:brewery breweries.csv --env=prod
 Start: Memory: 10.49M
 End: Time: 22.2s - Memory: 20.97M - Diff: 10.48M</code></pre>
 
-						<aside class="notes">
-							Take care! By default, commands are launched in dev environment!!!<br />
-							Dev environment<br />
-						</aside>
-					</section>
+            <aside class="notes">
+              Take care! By default, commands are launched in dev environment!!!<br />
+              Dev environment<br />
+            </aside>
+          </section>
 
-					<section>
-						<h4>What is happening?</h4>
+          <section>
+            <h4>What is happening?</h4>
 
-						<pre><code class="sql">DEBUG: "START TRANSACTION" [] []
+            <pre><code class="sql">[...]
+DEBUG: "START TRANSACTION" [] []
 DEBUG: INSERT INTO brewery [...] []
 DEBUG: "COMMIT" [] []
 DEBUG: SELECT [...] FROM brewery b0_ WHERE b0_.code LIKE 'omnis-sed'
@@ -248,40 +295,39 @@ DEBUG: "START TRANSACTION" [] []
 DEBUG: INSERT INTO brewery [...] []
 DEBUG: "COMMIT" [] []</code></pre>
 
+            <aside class="notes">
+              - 2 queries per item<br />
+              - lot of transactions (1 per item)<br />
+              Doctrine advices (and SGBD) is to flush sooner<br />
+              Calculate the right ratio item per flush (You need to test)<br />
+            </aside>
+          </section>
 
-						<aside class="notes">
-							- 2 queries per item<br />
-							- lot of transactions (1 per item)<br />
-							Doctrine advices (and SGBD) is to flush sooner<br />
-							Calculate the right ratio item per flush (You need to test)<br />
-						</aside>
-					</section>
+          <section>
+            <h4>Step 1: Batch size 100</h4>
 
-					<section>
-						<h4>Step 1: Batch size 100</h4>
-
-						<pre><code class="bash">[Doctrine\DBAL\Exception\UniqueConstraintViolationException]
+            <pre><code class="bash">[Doctrine\DBAL\Exception\UniqueConstraintViolationException]
 [Doctrine\DBAL\Driver\PDOException]
 [PDOException]
 SQLSTATE[23000]: Integrity constraint violation:
 1062 Duplicate entry 'id-quia' for key 'searchunique_idx'</code></pre>
 
-						<aside class="notes">
-							Possibilité de faire un begin transaction tout au début et d'avoir une grande transaction<br />
-						</aside>
-					</section>
+            <aside class="notes">
+              Possibilité de faire un begin transaction tout au début et d'avoir une grande transaction<br />
+            </aside>
+          </section>
 
-					<section>
-						Explain what happens with a schema :)<br />
-						1 schéma avant<br />
-						1 schéma après
+          <section>
+            Explain what happens with a schema :)<br />
+            1 schéma avant<br />
+            1 schéma après
 
-					</section>
+          </section>
 
-					<section>
-						<h4>Step 2: Create validator</h4>
+          <section>
+            <h4>Step 2: Create validator</h4>
 
-						<pre><code class="php">class UniqueEntityCodeValidator extends ConstraintValidator {
+            <pre><code class="php">class UniqueEntityCodeValidator extends ConstraintValidator {
   private $codeSet = [];
 
   public function validate($entity, Constraint $constraint) {
@@ -297,31 +343,31 @@ SQLSTATE[23000]: Integrity constraint violation:
   }
 }</code></pre>
 
-					</section>
+          </section>
 
-					<section>
-						<h4>Relaunch the import now!</h4>
-						<pre><code class="bash">Start: Memory: 10.49M
+          <section>
+            <h4>Relaunch the import now!</h4>
+            <pre><code class="bash">Start: Memory: 10.49M
 Entity "id-quia" not valid:
   The value "id-quia" is already set in another entity
 1000 entity written
 End: Time: 1.79s - Memory: 20.97M - Diff: 10.48M</code></pre>
 
-						Previous results:
-						<pre><code class="bash">Start: Memory: 10.49M
+            Previous results:
+            <pre><code class="bash">Start: Memory: 10.49M
 1001 entity written
 End: Time: 22.2s - Memory: 20.97M - Diff: 10.48M</code></pre>
-					</section>
-				</section>
+          </section>
+        </section>
 
-				<section>
-					<section>
-						<h4>Step 3: Update breweries</h4>
+        <section>
+          <section>
+            <h4>Step 3: Update breweries</h4>
 
-						Autre fichier avec 1 ligne<br />
-						This file contains a name longer than expected<br />
+            Autre fichier avec 1 ligne<br />
+            This file contains a name longer than expected<br />
 
-						<pre><code class="bash">bin/console batch:import:brewery breweries_update.csv --env=prod
+            <pre><code class="bash">bin/console batch:import:brewery breweries_update.csv --env=prod
 Memory: 10.49M
 Entity "id-quia" not valid: This value is too long.
   It should have 100 characters or less.
@@ -333,323 +379,447 @@ Entity "id-quia" not valid: This value is too long.
   SQLSTATE[22001]: String data, right truncated:
     1406 Data too long for column 'name' at row 1</code></pre>
 
-						<aside class="notes">
-							La validation a bien lieu est remonté, l'objet n'est pas persisté. Mais un update est quand même envoyé.<br />
-							Celui a pris du temps à être compris<br />
-						</aside>
-					</section>
+            <aside class="notes">
+              La validation a bien lieu est remonté, l'objet n'est pas persisté. Mais un update est quand même envoyé.<br />
+              Celui a pris du temps à être compris<br />
+            </aside>
+          </section>
 
-					<section>
-						<h4>What about the writer</h4>
+          <section>
+            <h4>What about the writer</h4>
 
-						Schéma step 3
+            Schéma step 3
 
-						<aside class="notes">
-							Explication du schéma<br />
-							2 façons de faire pour corriger ce problème.<br />
-							Détacher mon entity de l'UOW afin qu'elle ne soit pas prise en compte (souvent coûteux en temps de le faire ligne par ligne
-						</aside>
+            <aside class="notes">
+              Explication du schéma<br />
+              2 façons de faire pour corriger ce problème.<br />
+              Détacher mon entity de l'UOW afin qu'elle ne soit pas prise en compte (souvent coûteux en temps de le faire ligne par ligne
+            </aside>
 
-					</section>
+          </section>
 
-					<section>
-						<h4>Change Tracking Policy</h4>
+          <section>
+            <h4>Change Tracking Policy</h4>
 
-						http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/change-tracking-policies.html
+            http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/change-tracking-policies.html
 
-						<blockquote>
-							"It is the process of determining what has changed in managed entities since the last time they were synchronized with the db"
-						</blockquote>
+            <blockquote>
+              "It is the process of determining what has changed in managed entities since the last time they were synchronized with the db"
+            </blockquote>
 
-						<ul>
-							<li>Deferred implicit (default)</li>
-							<li>Deferred explicit</li>
-							<li>Notify</li>
-						</ul>
+            <ul>
+              <li>Deferred implicit (default)</li>
+              <li>Deferred explicit</li>
+              <li>Notify</li>
+            </ul>
 
-						<aside class="notes">Defined per entity<br />
-							Implicit: Doctrine detects the change by a property-by property comparison at commit time. EntityManager::flush(); everything<br />
-							Explicit: Same but need to call explicitely EntityManager::persist(). More efficient ;)<br />
-							Notify: You need to implement by yourself the changes using listeners. It's far more efficient.
-						</aside>
-					</section>
+            <aside class="notes">Defined per entity<br />
+              Implicit: Doctrine detects the change by a property-by property comparison at commit time. EntityManager::flush(); everything<br />
+              Explicit: Same but need to call explicitely EntityManager::persist(). More efficient ;)<br />
+              Notify: You need to implement by yourself the changes using listeners. It's far more efficient.
+            </aside>
+          </section>
 
-					<section>
-						<h4>Deferred explicit implementation</h4>
+          <section>
+            <h4>Deferred explicit implementation</h4>
 
-						<pre><code class="yml">BeerBundle\Entity\Brewery:
+            <pre><code class="yml">BeerBundle\Entity\Brewery:
   type: entity
   table: brewery
   repositoryClass: BeerBundle\Entity\Repository\EntityRepository
   changeTrackingPolicy: DEFERRED_EXPLICIT</code></pre>
 
-						<aside class="notes">
-							Plus explicite (comme son nom l'indique)<br />
-							Plus efficace car Doctrine ne va checker les diff que sur ce qu'on lui a dit de persister<br />
-							Cela résoud le problème fonctionnel mais il ne résoud pas réellement le problème de scalabilité mais nous verrons ça un peu plus tard.<br />
-							La réponse à la scalabilité est de détacher cet objet de l'UOW<br />
-							Je trouvais important de vous présenter ce fonctionnement pour mieux comprendre doctrine<br />
-						</aside>
+            <aside class="notes">
+              Plus explicite (comme son nom l'indique)<br />
+              Plus efficace car Doctrine ne va checker les diff que sur ce qu'on lui a dit de persister<br />
+              Cela résoud le problème fonctionnel mais il ne résoud pas réellement le problème de scalabilité mais nous verrons ça un peu plus tard.<br />
+              La réponse à la scalabilité est de détacher cet objet de l'UOW<br />
+              Je trouvais important de vous présenter ce fonctionnement pour mieux comprendre doctrine<br />
+            </aside>
 
-					</section>
-				</section>
+          </section>
+        </section>
 
-				<section>
-					<section>
-						<h4>Import beers (10000 lines)</h4>
+        <section>
+          <section>
+            <h4>Import beers (10000 lines)</h4>
 
-						<pre><code class="bash">bin/console batch:import:beer beers_10k.csv --env=prod
+            <pre><code class="bash">bin/console batch:import:beer beers_10k.csv --env=prod
 Start: Memory: 10.49M
 10000 entity written
 End: Time: 20.18s - Memory: 92.27M - Diff: 81.78M</code></pre>
 
-						Faire graphique avec la consommation mémoire tous les 1000 insertions
+            <div class="fragment">
+              <h4>Import beers (20000 lines)</h4>
 
-						Memory: 10.49M
-						Time: 2.47s - Memory: 25.17M - Diff: 14.68M
-						Time: 2.27s - Memory: 33.55M - Diff: 8.38M
-						Time: 1.96s - Memory: 41.94M - Diff: 8.39M
-						Time: 1.9s - Memory: 50.33M - Diff: 8.39M
-						Time: 1.98s - Memory: 56.62M - Diff: 6.29M
-						Time: 1.93s - Memory: 62.91M - Diff: 6.29M
-						Time: 1.92s - Memory: 71.3M - Diff: 8.39M
-						Time: 1.93s - Memory: 77.59M - Diff: 6.29M
-						Time: 1.97s - Memory: 85.98M - Diff: 8.39M
-						Time: 1.97s - Memory: 92.27M - Diff: 6.29M
-						Time: 20.31s - Memory: 92.27M
-
-						<aside class="notes">
-						</aside>
-				  </section>
-
-					<section>
-						<h4>Import beers (20000 lines)</h4>
-
-						<pre><code class="bash">bin/console batch:import:beer beers_20k.csv --env=prod
+              <pre><code class="bash">bin/console batch:import:beer beers_20k.csv --env=prod
 
 PHP Fatal error:
   Allowed memory size of 134217728 bytes exhausted
   (tried to allocate 20480 bytes)</code></pre>
+            </div>
 
-						<aside class="notes">
-							Useless to increase PHP memory limit, it will probably break later when my file will be bigger
-						</aside>
+            <aside class="notes">
+              Useless to increase PHP memory limit, it will probably break later when my file will be bigger
+            </aside>
 
-					</section>
+          </section>
 
-					<section>
-						<h4>Explanation memory leak problems</h4>
+          <section>
+            <h4>Memory consumption</h4>
 
-						Increase memory usage<br />
-						Decrease performance<br />
+            <img src="resources/img/doctrine-memory-leak-step3.png" />
 
-						GC is run more often and for nothing because it is not able to free memory<br />
-						It leads to an increase of CPU usage of the process<br />
+            <aside class="notes">
+              Every 5000 items<br />
+              300k items
+            </aside>
+          </section>
 
-						<aside class="notes">
-							Maybe deep into memory usage and garbage collector in PHP<br />
-							How to free the memory of an object<br />
-							No object duplication<br />
-							It's a link on its address and then a reference counter to know how many time an object is used<br />
-							When object is not used anymore, it could be free<br />
-						</aside>
-					</section>
+          <section>
+            <h4>Explanation memory leak problems</h4>
 
-					<section>
-						<h4>php-meminfo</h4>
+            Increase memory usage<br />
+            Decrease performance<br />
 
-						Free & open source PHP extension<br />
-						https://github.com/BitOne/php-meminfo<br />
-						Give insight about PHP memory content<br />
+            GC is run more often and for nothing because it is not able to free memory<br />
+            It leads to an increase of CPU usage of the process<br />
 
-						<aside class="notes">
-							License MIT<br />
-							Its main goal is to help you understand memory leaks: by looking at data present in memory, you can better understand your application behaviour.<br />
-							We will take a look deeper using a PHP extension named php-meminfo<br />
-						</aside>
+            <aside class="notes">
+              Maybe deep into memory usage and garbage collector in PHP<br />
+              How to free the memory of an object<br />
+              No object duplication<br />
+              It's a link on its address and then a reference counter to know how many time an object is used<br />
+              When object is not used anymore, it could be free<br />
+            </aside>
+          </section>
 
-					</section>
+          <section>
+            <h4>php-meminfo</h4>
 
-					<section>
-						<h4>php-meminfo: How it works?</h4>
+            Free & open source PHP extension<br />
+            https://github.com/BitOne/php-meminfo<br />
+            Give insight about PHP memory content<br />
 
-						Dump memory using
+            <aside class="notes">
+              License MIT<br />
+              Its main goal is to help you understand memory leaks: by looking at data present in memory, you can better understand your application behaviour.<br />
+              We will take a look deeper using a PHP extension named php-meminfo<br />
+            </aside>
 
-						<pre><code class="php">meminfo_info_dump(fopen('/tmp/doctrine_batch.log', 'w'));</code></pre>
+          </section>
 
-						<aside class="notes">Use gc_collect_cycles(); before?</aside>
-					</section>
+          <section>
+            <h4>php-meminfo: How it works?</h4>
 
-					<section>
-						<h4>Have summary by object types</h4>
+            Dump memory using
 
-						<pre><code class="bash">$ bin/analyzer summary /tmp/doctrine_batch.log</code></pre>
+            <pre><code class="php">meminfo_info_dump(fopen('/tmp/doctrine_batch.log', 'w'));</code></pre>
 
-						<table>
-							<thead>
-							<tr>
-								<td>Type</td>
-								<td>Instances Count</td>
-								<td>Cumulated Self Size (bytes)</td>
-							</tr>
-							</thead>
-							<tbody>
-							<tr><td>BeerBundle\Entity\Brewery</td><td>21000</td><td>1512000</td></tr>
-							<tr><td>BeerBundle\Entity\Category</td><td>20139</td><td>1450008</td></tr>
-							<tr><td>Doctrine\ORM\Query\ResultSetMapping</td><td>11145</td><td>802440</td></tr>
-							<tr><td>Doctrine\ORM\Query\ParserResult</td><td>11139</td><td>802008</td></tr>
-							<tr><td>Doctrine\ORM\Query\Exec\SingleSelectExecutor</td><td>11139</td><td>802008</td></tr>
-							<tr><td>BeerBundle\Entity\Beer</td><td>10000</td><td>720000</td></tr>
-							</tbody>
-						</table>
+            <pre class="fragment"><code class="json">{
+  "header": {
+    "memory_usage":89735424,
+    "memory_usage_real":92274688,
+    "peak_memory_usage":90107432,
+    "peak_memory_usage_real":92274688
+  },
+  "items": {
+    "0x7f64be256100" : {
+      "type" : "array",
+      "size" : "72",
+      "symbol_name" : "_GET",
+      "is_root" : true,
+      "frame" : "BatchBundle\\Job\\Job->execute()",
+      "children" : {}
+    },
+    ...
+  }
+}</code></pre>
 
-					</section>
+            <aside class="notes">Use gc_collect_cycles(); before?</aside>
+          </section>
 
-					<section>
-						<h4>Analyze the memory dump for a specific object</h4>
+          <section>
+            <h4>Have summary by object types</h4>
 
-						<pre><code class="bash">bin/analyzer query -f "class=BeerBundle\\Entity\\Beer" -v /tmp/doctrine_batch.log</code></pre>
+            <pre><code class="bash">$ bin/analyzer summary /tmp/doctrine_batch.log</code></pre>
 
-						<table>
-							<thead>
-							<tr>
-								<td>Item ids</td>
-								<td>Item data</td>
-								<td>Children</td>
-							</tr>
-							</thead>
-							<tbody>
-							<tr>
-								<td>0x7f64ab801028</td>
-								<td>
-									Type: object<br />
-									Class: BeerBundle\Entity\Beer<br />
-									[...]
-								</td>
-								<td>
-									id: 0x7f64a8d354e0<br />
-									code: 0x7f64a8d35500<br />
-									[...]<br />
-									brewery: 0x7f64a8d355a0<br />
-									category: 0x7f64a8d355c0
-								</td>
-							</tr>
-							</tbody>
-						</table>
+            <div class="fragment">
+              <table class="small">
+                <thead>
+                <tr>
+                  <td>Type</td>
+                  <td>Instances Count</td>
+                  <td>Cumulated Self Size (bytes)</td>
+                </tr>
+                </thead>
+                <tbody>
+                <tr><td>BeerBundle\Entity\Brewery</td><td>21000</td><td>1512000</td></tr>
+                <tr><td>BeerBundle\Entity\Category</td><td>20139</td><td>1450008</td></tr>
+                <tr><td>Doctrine\ORM\Query\ResultSetMapping</td><td>11145</td><td>802440</td></tr>
+                <tr><td>Doctrine\ORM\Query\ParserResult</td><td>11139</td><td>802008</td></tr>
+                <tr><td>Doctrine\ORM\Query\Exec\SingleSelectExecutor</td><td>11139</td><td>802008</td></tr>
+                <tr><td>BeerBundle\Entity\Beer</td><td>10000</td><td>720000</td></tr>
+                </tbody>
+              </table>
+            </div>
 
-					</section>
+          </section>
 
-					<section>
-						<h4>Analyze the memory path</h4>
+          <section>
+            <h4>Analyze the memory dump for a specific object</h4>
 
-						<pre><code class="bash">bin/analyzer ref-path /tmp/doctrine_batch.log 0x7f64ab801028
+            <pre><code class="bash">$ bin/analyzer query -f "class=BeerBundle\\Entity\\Beer" -v /tmp/doctrine_batch.log</code></pre>
+
+            <div class="fragment">
+              <table>
+                <thead>
+                <tr>
+                  <td>Item ids</td>
+                  <td>Item data</td>
+                  <td>Children</td>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                  <td>0x7f64ab801028</td>
+                  <td>
+                    Type: object<br />
+                    Class: BeerBundle\Entity\Beer<br />
+                    [...]
+                  </td>
+                  <td>
+                    id: 0x7f64a8d354e0<br />
+                    code: 0x7f64a8d35500<br />
+                    [...]<br />
+                    brewery: 0x7f64a8d355a0<br />
+                    category: 0x7f64a8d355c0
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+
+          </section>
+
+          <section>
+            <h4>Analyze the memory path</h4>
+
+            <pre><code class="bash">bin/analyzer ref-path /tmp/doctrine_batch.log 0x7f64ab801028
 Found 3 paths</code></pre>
 
-						<div>First path</div>
-						Path from 0x7f64be256280
-						0x7f64ab801028
-						^
-						|
-						1 (0x7f64afa4a920)
-						^
-						|
-						BeerBundle\Entity\Beer (0x7f64a8c65c80)
-						^
-						|
-						identityMap(0x7f64a8c6d320)
-						^
-						|
-						unitOfWork (0x7f64afdbe7c0)
-						^
-						|
-						doctrine.orm.default_entity_manager (0x7f64af9c08e0)
-						^
-						|
-						services (0x7f64af9c1280)
-						^
-						|
-						container (0x7f64be256280)
+            <div>First path</div>
+            Path from 0x7f64be256280
+            0x7f64ab801028
+            ^
+            |
+            1 (0x7f64afa4a920)
+            ^
+            |
+            BeerBundle\Entity\Beer (0x7f64a8c65c80)
+            ^
+            |
+            identityMap (0x7f64a8c6d320)
+            ^
+            |
+            unitOfWork (0x7f64afdbe7c0)
+            ^
+            |
+            doctrine.orm.default_entity_manager (0x7f64af9c08e0)
+            ^
+            |
+            services (0x7f64af9c1280)
+            ^
+            |
+            container (0x7f64be256280)
 
-						<aside class="notes">Pourquoi est-ce que l'objet tout en haut n'est pas celui que je recherche?</aside>
+            <aside class="notes">Pourquoi est-ce que l'objet tout en haut n'est pas celui que je recherche?</aside>
 
-					</section>
+          </section>
 
-					<section>
-						<h4>Deep into the UOW</h4>
+          <section>
+            <h4>Deep into the UOW: The identity map</h4>
 
-						<pre><code class="php">$this->identityMap[$className][$idHash] = $entity;</code></pre>
+            <div>
+              <pre><code class="php">$this->identityMap[$className][$idHash] = $entity;</code></pre>
 
-						This array stores a map between id and entiy.<br />
-						It allows to fetch from its identifier an entity that is already in the UOW and avoid a new SQL query<br />
+              <ul>
+                <li>Stores references to all managed entities</li>
+                <li>Entities are grouped by their class name</li>
+                <li>Avoid entity duplication</li>
+              </ul>
+            </div>
+            <br />
 
-						<pre><code class="php">$this->entityState[spl_object_hash($entity)];</code></pre>
-						This array stores the status of your entity.<br />
-						4 status: Managed, New, Detached or Removed<br />
+            <div class="fragment">
+              <pre><code class="php">$breweryA = $breweryRepo->findOneBy(['code' => 'id-quia']);
+$breweryB = $breweryRepo->findOneBy(['name' => 'Dietrich Group']);
+$this->assertSame($breweryA, $breweryB);</code></pre>
+            </div>
+
+            <aside class="notes">
+              4 status of your entity (New, Managed, Detached, Removed)<br />
+              Cache niveau 2 pour identityMap?<br/>
+	            Ne signifie pas qu'il n'y a pas de query SQL<br />
+            </aside>
+
+          </section>
+
+          <section>
+            <h4>Detach versus clear</h4>
+
+            3 ways to remove from the UOW:
+
+            <pre class="fragment"><code class="php">$em->detach($entity);</code></pre>
+            <pre class="fragment"><code class="php">$em->clear('BeerBundle\Entiy\Beer');</code></pre>
+            <pre class="fragment"><code class="php">$em->clear();</code></pre>
+
+            <aside class="notes">
+              detach: Detach an entity from the UOW. Does not remove updateCollections, removeCollections, etc. done by commit();<br />
+              clear($className): Detach all entities of the class name<br />
+              clear(): Clears UOW
+            </aside>
+          </section>
+
+          <section>
+            <h4>Detach entities</h4>
+
+            Relation is ManyToOne<br />
+            No cascade detach!<br />
+            Not the same lifecycle<br />
+            Categories and Breweries exist without Beers
+
+            <pre><code class="bash">bin/console batch:import:beer beers_10k.csv --env=prod
+End: Time: 20.18s - Memory: 92.27M - Diff: 81.78M</code></pre>
+
+            <aside class="notes">
+              Don't want to cascade detach because other categories needs to stay in the UOW as they can be used by another Beer
+            </aside>
+          </section>
+
+          <section>
+            <h4>Detach entities</h4>
+
+            <pre><code class="php">// EntityWriter
+$this->em->flush();
+$this->em->clear('BeerBundle\Entity\Beer');
+// or loop on items and call detach
+foreach ($items as $item) {
+  $this->em->detach($item);
+}</code></pre>
+
+            <pre><code class="bash">bin/console batch:import:beer beers_10k.csv --env=prod
+End: Time: 20.91s - Memory: 69.21M - Diff: 56.63M</code></pre>
+
+            <aside class="notes">Same perf between loop detach and clear($className)</aside>
+          </section>
+
+          <section>
+            <h4>Analyze memory</h4>
+
+            <table class="small">
+              <thead>
+              <tr>
+                <td>Type</td>
+                <td>Instances Count</td>
+                <td>Cumulated Self Size (bytes)</td>
+              </tr>
+              </thead>
+              <tbody>
+              <tr><td>Doctrine\ORM\Query\ResultSetMapping</td><td>11145</td><td>802440</td></tr>
+              <tr><td>Doctrine\ORM\Query\ParserResult</td><td>11139</td><td>802008</td></tr>
+              <tr><td>Doctrine\ORM\Query\Exec\SingleSelectExecutor</td><td>11139</td><td>802008</td></tr>
+              <tr><td>BeerBundle\Entity\Brewery</td><td>1000</td><td>72000</td></tr>
+              <tr><td>BeerBundle\Entity\Category</td><td>139</td><td>10008</td></tr>
+              </tbody>
+            </table>
+
+            <aside class="notes">
+              Categories and Breweries still in memory but, this number won't increase!
+            </aside>
+          </section>
+
+          <section>
+            <h4>Clear UOW</h4>
+            <pre><code class="php">// EntityWriter
+$this->em->flush();
+$this->em->clear();</code></pre>
+
+            <div class="fragment">
+              <pre><code class="bash">bin/console batch:import:beer beers_10k.csv --env=prod
+End: Time: 20.52s - Memory: 67.11M - Diff: 54.53M</code></pre>
+            </div>
+
+            <table class="small fragment">
+              <thead>
+              <tr>
+                <td>Type</td>
+                <td>Instances Count</td>
+                <td>Cumulated Self Size (bytes)</td>
+              </tr>
+              </thead>
+              <tbody>
+              <tr><td>Doctrine\ORM\Query\ResultSetMapping</td><td>11145</td><td>802440</td></tr>
+              <tr><td>Doctrine\ORM\Query\ParserResult</td><td>11139</td><td>802008</td></tr>
+              <tr><td>Doctrine\ORM\Query\Exec\SingleSelectExecutor</td><td>11139</td><td>802008</td></tr>
+              </tbody>
+            </table>
+            <aside class="notes">
+              2M less than previous execution<br />
+              No more Brewery nor Category<br />
+              Not necessary to clear the whole UOW in this case<br />
+            </aside>
+          </section>
 
 
-						<aside class="notes">
-							Cache niveau 2 pour identityMap?<br/>
-							See doctrine website on entity status to add content
-						</aside>
+	        
 
-					</section>
+        </section>
 
-					<section>
-						<h4>Detach versus clear</h4>
+        <section>
+          <h2>Sujets à aborder</h2>
 
-						3 ways to detach everything
-						-> $em->detach($entity); // Detach an entity from the UOW. Does not remove updateCollections, removeCollections, etc. done by commit()
-						-> $em->clear(get_class($entity)); // Detach all entity of the class from the UOW. Does not remove updateCollections, etc. done by commit()
-						-> $em->clear(); // Clear the UOW.
+          - Detach vs clear($entityName) vs clear
+          - ResultMapping & DQL queries
+        </section>
 
-						Of course detach and clear(class) also calls cascade detach
-					</section>
-				</section>
+        <section>
+          <h4>Export</h4>
 
-				<section>
-					<h2>Sujets à aborder</h2>
-
-					- Detach vs clear($entityName) vs clear
-					- ResultMapping & DQL queries
-				</section>
-
-				<section>
-					<h4>Export</h4>
-
-					1. findAll()
-					2. findById() + limit
-					3. iterate() method
+          1. findAll()
+          2. findById() + limit
+          3. iterate() method
 
 
-				</section>
+        </section>
 
-				<section>
-					<h2>What's next?</h2>
+        <section>
+          <h2>What's next?</h2>
 
-					Multi import? (beers + breweries) -> Quick presentation
-					Improve performance? (test "Change tracking policy" -> notify)
-					Mass Delete?
-				</section>
+          Multi import? (beers + breweries) -> Quick presentation
+          Improve performance? (test "Change tracking policy" -> notify)
+          Mass Delete?
+        </section>
 
-			</div>
-		</div>
+      </div>
+    </div>
 
-		<script src="lib/js/head.min.js"></script>
-		<script src="js/reveal.js"></script>
+    <script src="lib/js/head.min.js"></script>
+    <script src="js/reveal.js"></script>
 
-		<script>
-			// More info about config & dependencies:
-			// - https://github.com/hakimel/reveal.js#configuration
-			// - https://github.com/hakimel/reveal.js#dependencies
-			Reveal.initialize({
-				dependencies: [
-					{ src: 'plugin/markdown/marked.js' },
-					{ src: 'plugin/markdown/markdown.js' },
-					{ src: 'plugin/notes/notes.js', async: true },
-					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
-				]
-			});
-		</script>
+    <script>
+      // More info about config & dependencies:
+      // - https://github.com/hakimel/reveal.js#configuration
+      // - https://github.com/hakimel/reveal.js#dependencies
+      Reveal.initialize({
+        dependencies: [
+          { src: 'plugin/markdown/marked.js' },
+          { src: 'plugin/markdown/markdown.js' },
+          { src: 'plugin/notes/notes.js', async: true },
+          { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+        ]
+      });
+    </script>
 
-	</body>
+  </body>
 </html>

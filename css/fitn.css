@@ -7,3 +7,21 @@
     max-height: 450px;
     font-size: 20px;
 }
+
+.reveal div .left {
+    left: -10%;
+    text-align: left;
+    float: left;
+    width: 50%;
+    height: 100%;
+}
+
+.reveal div .right {
+    left: 35%;
+    float: right;
+    width: 50%;
+}
+
+.reveal table td {
+    font-size: 26px;
+}
