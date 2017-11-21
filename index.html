@@ -27,10 +27,9 @@
     <div class="reveal">
       <div class="slides">
 
-
-        <section>
-          <h2>The worst best idea: Doing batch with PHP and Doctrine</h2>
-          <img src="" />
+        <section data-background="resources/pictures/background-plane_crash.jpg">
+          <h2>The worst best idea:</h2>
+          <h4>Doing batch with PHP and Doctrine</h4>
 
           <aside class="notes">
             Pourquoi ce sujet ?<br />
@@ -54,37 +53,39 @@
               <li>25 years old</li>
               <li>+15 years PHP</li>
               <li>Lead Developer @Akeneo <img src="resources/icons/akeneo.png" class="icon" /></li>
-              <li>Beer is life!!</li>
+              <li>Beer addict!!</li>
             </ul>
           </div>
         </section>
 
-        <section data-background="resources/pictures/background-beers.jpg">
-          <h2>Site web</h2>
-          <ul>
-            <li>PHP 7</li>
-            <li>MySQL</li>
-            <li>Symfony 3.3</li>
-            <li>Doctrine</li>
-          </ul>
-          <aside class="notes">
-            Super site web qui recense toutes les bières, toutes les brasseries avec des commentaires des internautes !<br />
-            Une fois le site prêt, je me suis rendu compte qu'il allait falloir que j'importe tout un tas de données.<br />
-            Toute relation avec des projets existants ou ayant existés étant absolument fait exprès
-          </aside>
-        </section>
-
         <section>
+          <section data-background="resources/pictures/background-beers.jpg">
+            <h2>Site web</h2>
+            <ul>
+              <li>PHP 7</li>
+              <li>MySQL 5.7</li>
+              <li>Symfony 3.3</li>
+              <li>Doctrine 2.5</li>
+            </ul>
+            <aside class="notes">
+              Super site web qui recense toutes les bières, toutes les brasseries avec des commentaires des internautes !<br />
+              Une fois le site prêt, je me suis rendu compte qu'il allait falloir que j'importe tout un tas de données.<br />
+              Toute relation avec des projets existants ou ayant existés étant absolument fait exprès
+            </aside>
+          </section>
+
           <section>
-            <h2>PHP n'est pas fait pour faire du batch</h2>
+            <h2>PHP is not done for batch processes</h2>
 
-            Requête HTTP<br />
+            <ul>
+              <li>HTTP requests</li>
+              <li>Timeout</li>
+              <li>Take care at memory consumption</li>
+            </ul>
 
-            Timeout<br />
-
-            Take care at memory consumption
-            <aside class="notes">Comparaison avec le fonctionnement d'autres langages type Java?</aside>
-
+            <aside class="notes">
+              Comparaison avec le fonctionnement d'autres langages type Java?
+            </aside>
           </section>
 
           <section>
