@@ -1,6 +1,16 @@
+ul.contacts li {
+  list-style: none;
+  font-size: 26px;
+}
+
+ul.contacts li img {
+  vertical-align: middle;
+}
+
 .icon {
     height: 50px;
     width: 50px;
+    margin-right: 20px;
 }
 
 .reveal pre code {
@@ -8,20 +18,39 @@
     font-size: 20px;
 }
 
-.reveal div .left {
-    left: -10%;
-    text-align: left;
-    float: left;
-    width: 50%;
-    height: 100%;
-}
-
-.reveal div .right {
-    left: 35%;
-    float: right;
-    width: 50%;
-}
-
 .reveal table td {
     font-size: 26px;
+}
+
+.reveal section img {
+  border: none;
+  background: none;
+  box-shadow: none;
+}
+
+.reveal section img.schema {
+    background: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+    padding: 10px;
+}
+
+.hljs {
+  background: black !important;
+}
+
+.mimi {
+
+  background-repeat: no-repeat !important;
+  background-size: 50% auto !important;
+
+  display: grid !important;
+  grid-template-columns: 1fr 1fr;
+}
+
+.mimi.left {
+  background-position: left !important;
+}
+
+.mimi.right {
+  background-position: right !important;
 }
