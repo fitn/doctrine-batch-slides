@@ -10,7 +10,12 @@ ul.contacts li img {
 .icon {
     height: 50px;
     width: 50px;
-    margin-right: 20px;
+    margin-right: 20px !important;
+}
+
+.medium-icon {
+    height: 128px;
+    width: 128px;
 }
 
 .reveal pre code {
@@ -29,17 +34,16 @@ ul.contacts li img {
 }
 
 .reveal section img.schema {
-    background: white;
+    background: rgba(255, 255, 255, 0.6);
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
     padding: 10px;
 }
 
 .hljs {
-  background: black !important;
+  background: rgba(0, 0, 0, 0.8) !important;
 }
 
-.mimi {
-
+.vsep {
   background-repeat: no-repeat !important;
   background-size: 50% auto !important;
 
@@ -47,10 +51,30 @@ ul.contacts li img {
   grid-template-columns: 1fr 1fr;
 }
 
-.mimi.left {
+.vsep.left {
   background-position: left !important;
 }
 
-.mimi.right {
+.vsep.right {
   background-position: right !important;
+}
+
+.hsep {
+    background-repeat: no-repeat !important;
+    background-size: auto 50% !important;
+
+    display: grid !important;
+    grid-template-rows: 1fr 1fr;
+}
+
+.hsep.top {
+    background-position: top !important;
+}
+
+.hsep.bottom {
+    background-position: bottom !important;
+}
+
+.reveal table {
+    background: rgba(0, 0, 0, 0.4)
 }

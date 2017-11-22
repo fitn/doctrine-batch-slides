@@ -12,8 +12,6 @@
     <link rel="stylesheet" href="lib/css/zenburn.css">
     <link rel="stylesheet" href="css/fitn.css">
 
-
-
     <!-- Printing and PDF exports -->
     <script>
       var link = document.createElement( 'link' );
@@ -42,24 +40,27 @@
           </aside>
         </section>
 
-        <section data-background="resources/pictures/background-vertigo.jpg" class="mimi left">
+        <section class="vsep left">
           <div class="left">
             <img src="resources/me.jpg" />
           </div>
           <div class="right">
             <h2>Romain Monceau</h2>
             <ul class="contacts">
-              <li><img src="resources/icons/twitter.png" class="icon" /> @RomainMonceau</li>
-              <li>25 years old</li>
-              <li>+15 years PHP</li>
+              <li><img src="resources/icons/twitter.png" class="icon" />@RomainMonceau</li>
+              <li><img src="resources/icons/birthday.png" class="icon" />25 years old</li>
+              <li><img src="resources/icons/php.png" class="icon" />+15 years</li>
               <li><img src="resources/icons/akeneo.png" class="icon" /> Lead Developer @Akeneo </li>
-              <li>Beer addict!!</li>
             </ul>
           </div>
+
+          <aside class="notes">
+            Beer addict<br />
+          </aside>
         </section>
 
-        <section>
-          <section data-background="resources/pictures/background-beers.jpg">
+        <section data-background="resources/pictures/background-beers.jpg">
+          <section>
             <h2>Site web</h2>
             <ul>
               <li>PHP 7</li>
@@ -75,7 +76,8 @@
           </section>
 
           <section>
-            <h2>PHP is not done for batch processes</h2>
+            <div><img src="resources/icons/php.png" class="medium-icon" /></div>
+            <h3>PHP is not done for batch processes</h3>
 
             <ul>
               <li>HTTP requests</li>
@@ -89,13 +91,14 @@
           </section>
 
           <section>
-            <h2>Doctrine n'est pas fait pour le batch</h2>
+            <div><img src="resources/icons/doctrine-orm.png" class="medium-icon" /></div>
+            <h3>Doctrine has not been done for batch processes</h3>
 
             <img src="resources/img/doctrine_batch_doc.png" />
           </section>
         </section>
 
-        <section>
+        <section data-background="resources/pictures/background-model.jpg">
           <section>
             <h2>Model presentation</h2>
 
@@ -151,7 +154,7 @@
           </section>
         </section>
 
-        <section>
+        <section data-background="resources/pictures/background-batch.jpg">
 
           <section>
             <h2>How doing batch?</h2>
@@ -161,6 +164,7 @@
             <aside class="notes">
               Ca se présente globalement comme un ETL (Extract / Transform / Load)<br />
               Stack maison largement inspiré d'Akeneo batch qui est un portage de Spring Batch (Java) en PHP<br />
+              Tout cela est lancé depuis une commande Symfony
             </aside>
           </section>
 
@@ -250,20 +254,30 @@ public function findOrCreateCategory(string $code) {
           </section>
         </section>
 
-        <section>
+        <section data-background="resources/pictures/background-brewery.jpg">
           <section>
-            <h4>Import breweries (500 lines)</h4>
+            <h2>Import breweries (500 lines)</h2>
 
-            <pre><code class="bash">> bin/console batch:import:brewery breweries.csv
+            <pre><code class="yaml">code;name;description
+id-quia;Dietrich Group;I know THAT
+id-quia;Dietrich Group;I know THAT
+abbey-ales;Abbey Ales Brewery;Abbey Ales Brewery
+black-sheep;Black Sheep Brewery;A black sheep brewery
+oakkham;Oakham Ales;The famous Oakham brewery</code></pre>
+          </section>
+
+          <section>
+            <h4>Launch breweries import</h4>
+            <pre class="fragment"><code class="bash">$ bin/console batch:import:brewery breweries.csv
 Start: Memory: 12.58M
 End: Time: 25.77s - Memory: 29.36M - Diff: 16.78M</code></pre>
 
-            <pre><code class="bash">> bin/console batch:import:brewery breweries.csv --env=prod
+            <pre class="fragment"><code class="bash">$ bin/console batch:import:brewery breweries.csv --env=prod
 Start: Memory: 10.49M
 End: Time: 22.2s - Memory: 20.97M - Diff: 10.48M</code></pre>
 
             <aside class="notes">
-	            By default, batch size = 1<br />
+              By default, batch size = 1<br />
               Take care! By default, commands are launched in dev environment!!!<br />
             </aside>
           </section>
@@ -293,11 +307,12 @@ DEBUG: "COMMIT" [] []</code></pre>
           <section>
             <h4>Increase batch size to 100</h4>
 
-            <pre class="fragment"><code class="bash">[Doctrine\DBAL\Exception\UniqueConstraintViolationException]
+            <pre class="fragment"><code class="bash">$ bin/console batch:import:brewery breweries.csv --env=prod
+[Doctrine\DBAL\Exception\UniqueConstraintViolationException]
 [Doctrine\DBAL\Driver\PDOException]
 [PDOException]
-SQLSTATE[23000]: Integrity constraint violation:
-1062 Duplicate entry 'id-quia' for key 'searchunique_idx'</code></pre>
+  SQLSTATE[23000]: Integrity constraint violation:
+    1062 Duplicate entry 'id-quia' for key 'searchunique_idx'</code></pre>
 
             <aside class="notes">
 	            I relaunch the same import<br />
@@ -308,13 +323,13 @@ SQLSTATE[23000]: Integrity constraint violation:
           <section>
 	          <h4>Validation process: batch size 1</h4>
 
-	          <img src="resources/img/doctrine_step1_batch_size1.png" />
+	          <img src="resources/img/doctrine_step1_batch_size1.png" class="schema" />
           </section>
 
 	        <section>
 		        <h4>Validation process: batch size 100</h4>
 
-		        <img src="resources/img/doctrine_step1_batch_size100.png" />
+		        <img src="resources/img/doctrine_step1_batch_size100.png" class="schema" />
 
 		        <aside class="notes">
 			        Think about another way for validators!!!
@@ -322,7 +337,7 @@ SQLSTATE[23000]: Integrity constraint violation:
 	        </section>
 
           <section>
-            <h4>Create validator</h4>
+            <h4>Rework validator</h4>
 
             <pre><code class="php">class UniqueEntityCodeValidator extends ConstraintValidator {
   private $codeSet = [];
@@ -356,14 +371,23 @@ End: Time: 22.2s - Memory: 20.97M - Diff: 10.48M</code></pre>
           </section>
         </section>
 
-        <section>
+        <section data-background="resources/pictures/background-update.jpg">
+          <section>
+            <h2>Update and Change Tracking Policy</h2>
+
+            <pre class="fragment"><code class="yaml">code;name
+id-quia;"Dietrich GroupDietrich GroupDietrich Group[...]Dietrich Group"</code></pre>
+
+            <aside class="notes">
+              Another file with 1 line<br />
+              This file contains a name longer than expected<br />
+            </aside>
+          </section>
+
           <section>
             <h4>Update breweries</h4>
 
-            Another file with 1 line<br />
-            This file contains a name longer than expected<br />
-
-            <pre><code class="bash">bin/console batch:import:brewery breweries_update.csv --env=prod
+            <pre><code class="bash">$ bin/console batch:import:brewery breweries_update.csv --env=prod
 Memory: 10.49M
 Entity "id-quia" not valid: This value is too long.
   It should have 100 characters or less.
@@ -385,7 +409,7 @@ Entity "id-quia" not valid: This value is too long.
           <section>
             <h4>What happens?!</h4>
 
-            <img src="resources/img/doctrine_batch_schema_step_3.png" />
+            <img src="resources/img/doctrine_batch_schema_step_3.png" class="schema" />
 
             <aside class="notes">
               Explication du schéma<br />
@@ -396,11 +420,23 @@ Entity "id-quia" not valid: This value is too long.
           </section>
 
           <section>
-            <h4>Change Tracking Policy</h4>
+            <h3>Change Tracking Policy</h3>
 
             <blockquote>
               "It is the process of determining what has changed in managed entities since the last time they were synchronized with the db"
             </blockquote>
+
+            <a href="http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/change-tracking-policies.html">
+              http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/change-tracking-policies.html
+            </a>
+
+            <aside class="notes">
+              Defined per entity<br />
+            </aside>
+          </section>
+
+          <section>
+            <h3>Change Tracking Policy</h3>
 
             <ul>
               <li>Deferred implicit (default)</li>
@@ -408,8 +444,7 @@ Entity "id-quia" not valid: This value is too long.
               <li>Notify</li>
             </ul>
 
-            <aside class="notes">Defined per entity<br />
-	            http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/change-tracking-policies.html<br />
+            <aside class="notes">
               Implicit: Doctrine detects the change by a property-by property comparison at commit time. EntityManager::flush(); everything<br />
               Explicit: Same but need to call explicitely EntityManager::persist(). More efficient ;)<br />
               Notify: You need to implement by yourself the changes using listeners. It's far more efficient.
@@ -436,11 +471,16 @@ Entity "id-quia" not valid: This value is too long.
           </section>
         </section>
 
-        <section>
+        <section data-background="resources/pictures/background-leak.jpg">
+          <section>
+            <h2>Memory leaks</h2>
+            TODO: Put CSV file Beers.csv
+          </section>
+
           <section>
             <h4>Import beers (10000 lines)</h4>
 
-            <pre><code class="bash">bin/console batch:import:beer beers_10k.csv --env=prod
+            <pre><code class="bash">$ bin/console batch:import:beer beers_10k.csv --env=prod
 Start: Memory: 10.49M
 10000 entity written
 End: Time: 20.18s - Memory: 92.27M - Diff: 81.78M</code></pre>
@@ -448,7 +488,7 @@ End: Time: 20.18s - Memory: 92.27M - Diff: 81.78M</code></pre>
             <div class="fragment">
               <h4>Import beers (20000 lines)</h4>
 
-              <pre><code class="bash">bin/console batch:import:beer beers_20k.csv --env=prod
+              <pre><code class="bash">$ bin/console batch:import:beer beers_20k.csv --env=prod
 
 PHP Fatal error:
   Allowed memory size of 134217728 bytes exhausted
@@ -456,7 +496,8 @@ PHP Fatal error:
             </div>
 
             <aside class="notes">
-              Useless to increase PHP memory limit, it will probably break later when my file will be bigger
+              Useless to increase PHP memory limit,<br />
+              it will probably break later with a bigger file
             </aside>
 
           </section>
@@ -472,16 +513,21 @@ PHP Fatal error:
             </aside>
           </section>
 
+          <section data-background="resources/gif/truck_explosion.gif"></section>
+
           <section>
-            <h4>Explanation memory leak problems</h4>
+            <h3>Explanation memory leak problems</h3>
 
-            Increase memory usage<br />
-            Decrease performance<br />
-
-            GC is run more often and for nothing because it is not able to free memory<br />
-            It leads to an increase of CPU usage of the process<br />
+            <ul>
+              <li class="fragment">Increase memory usage</li>
+              <li class="fragment">GC is run more often...</li>
+              <li class="fragment">and for nothing!</li>
+              <li class="fragment">Decrease performance</li>
+            </ul>
 
             <aside class="notes">
+              3. not able to free memory<br />
+              4. It leads to an increase of CPU usage of the process<br />
               Maybe deep into memory usage and garbage collector in PHP<br />
               How to free the memory of an object<br />
               No object duplication<br />
@@ -490,27 +536,44 @@ PHP Fatal error:
             </aside>
           </section>
 
-          <section>
-            <h4>php-meminfo</h4>
+        </section>
 
-            Free & open source PHP extension<br />
-            https://github.com/BitOne/php-meminfo<br />
-            Give insight about PHP memory content<br />
+        <section data-background="resources/pictures/background-meminfo.jpg">
+
+          <section>
+            <h2>php-meminfo</h2>
+
+            <ul>
+              <li>Give insight about PHP memory content</li>
+              <li>Free & open source PHP extension</li>
+              <li><a href="https://github.com/BitOne/php-meminfo">https://github.com/BitOne/php-meminfo</a></li>
+            </ul>
 
             <aside class="notes">
               License MIT<br />
-              Its main goal is to help you understand memory leaks: by looking at data present in memory, you can better understand your application behaviour.<br />
+              Its main goal is to help you understand memory leaks: <br />
+              by looking at data present in memory, you can better understand your application behaviour.<br />
               We will take a look deeper using a PHP extension named php-meminfo<br />
             </aside>
 
           </section>
 
           <section>
-            <h4>php-meminfo: How it works?</h4>
+            <h3>php-meminfo: How it works?</h3>
 
-            Dump memory using
+            <ol>
+              <li class="fragment">Dump memory content</li>
+              <li class="fragment">Analyze content (summary)</li>
+              <li class="fragment">Analyze memory for an object type</li>
+              <li class="fragment">Analyze memory path for a specific object</li>
+            </ol>
+          </section>
 
-            <pre><code class="php">meminfo_info_dump(fopen('/tmp/doctrine_batch.log', 'w'));</code></pre>
+          <section>
+            <h4>Dump memory content</h4>
+
+            <pre><code class="php">// PHP
+meminfo_info_dump(fopen('/tmp/doctrine_batch.log', 'w'));</code></pre>
 
             <pre class="fragment"><code class="json">{
   "header": {
@@ -532,11 +595,11 @@ PHP Fatal error:
   }
 }</code></pre>
 
-            <aside class="notes">Use gc_collect_cycles(); before?</aside>
+            <aside class="notes"></aside>
           </section>
 
           <section>
-            <h4>Have summary by object types</h4>
+            <h4>Summarize content</h4>
 
             <pre><code class="bash">$ bin/analyzer summary /tmp/doctrine_batch.log</code></pre>
 
@@ -546,24 +609,26 @@ PHP Fatal error:
                 <tr>
                   <td>Type</td>
                   <td>Instances Count</td>
-                  <td>Cumulated Self Size (bytes)</td>
                 </tr>
                 </thead>
                 <tbody>
-                <tr><td>BeerBundle\Entity\Brewery</td><td>21000</td><td>1512000</td></tr>
-                <tr><td>BeerBundle\Entity\Category</td><td>20139</td><td>1450008</td></tr>
-                <tr><td>Doctrine\ORM\Query\ResultSetMapping</td><td>11145</td><td>802440</td></tr>
-                <tr><td>Doctrine\ORM\Query\ParserResult</td><td>11139</td><td>802008</td></tr>
-                <tr><td>Doctrine\ORM\Query\Exec\SingleSelectExecutor</td><td>11139</td><td>802008</td></tr>
-                <tr><td>BeerBundle\Entity\Beer</td><td>10000</td><td>720000</td></tr>
+                <tr><td>BeerBundle\Entity\Brewery</td><td>21000</td></tr>
+                <tr><td>BeerBundle\Entity\Category</td><td>20139</td></tr>
+                <tr><td>Doctrine\ORM\Query\ResultSetMapping</td><td>11145</td></tr>
+                <tr><td>Doctrine\ORM\Query\ParserResult</td><td>11139</td></tr>
+                <tr><td>Doctrine\ORM\Query\Exec\SingleSelectExecutor</td><td>11139</td></tr>
+                <tr><td>BeerBundle\Entity\Beer</td><td>10000</td></tr>
                 </tbody>
               </table>
             </div>
 
+            <aside class="notes">
+              La taille mémoire cumulée des objets est également disponible mais masquée ici
+            </aside>
           </section>
 
           <section>
-            <h4>Analyze the memory dump for a specific object</h4>
+            <h4>Analyze memory for an object type</h4>
 
             <pre><code class="bash">$ bin/analyzer query -f "class=BeerBundle\\Entity\\Beer" -v /tmp/doctrine_batch.log</code></pre>
 
@@ -599,44 +664,55 @@ PHP Fatal error:
           </section>
 
           <section>
-            <h4>Analyze the memory path</h4>
+            <h4>Analyze memory path for a specific object</h4>
 
-            <pre><code class="bash">bin/analyzer ref-path /tmp/doctrine_batch.log 0x7f64ab801028
+            <pre><code class="bash">$ bin/analyzer ref-path /tmp/doctrine_batch.log 0x7f64ab801028
 Found 3 paths
 0x7f64ab801028
-^
+&uarr;
 1 (0x7f64afa4a920)
-^
+&uarr;
 BeerBundle\Entity\Beer (0x7f64a8c65c80)
-^
+&uarr;
 identityMap (0x7f64a8c6d320)
-^
+&uarr;
 unitOfWork (0x7f64afdbe7c0)
-^
+&uarr;
 doctrine.orm.default_entity_manager (0x7f64af9c08e0)
-^
+&uarr;
 services (0x7f64af9c1280)
-^
+&uarr;
 container (0x7f64be256280)</code></pre>
-            <aside class="notes">Pourquoi est-ce que l'objet tout en haut n'est pas celui que je recherche?</aside>
 
+            <aside class="notes">
+              Pourquoi est-ce que l'objet tout en haut n'est pas celui que je recherche?
+            </aside>
           </section>
 
           <section>
-            <h4>Deep into the UOW: The identity map</h4>
+            <img src="resources/gif/oh_my_god_afraid.gif" />
+          </section>
 
+        </section>
+
+        <section data-background="resources/pictures/background-deep_uow.jpg">
+          <section>
+            <h2>Deep into the UOW</h2>
+          </section>
+
+          <section>
+            <h3>The identity map</h3>
             <div>
-              <pre><code class="php">$this->identityMap[$className][$idHash] = $entity;</code></pre>
-
               <ul>
                 <li>Stores references to all managed entities</li>
                 <li>Entities are grouped by their class name</li>
                 <li>Avoid entity duplication</li>
               </ul>
             </div>
-            <br />
 
             <div class="fragment">
+              <pre><code class="php">$this->identityMap[$className][$idHash] = $entity;</code></pre>
+
               <pre><code class="php">$breweryA = $breweryRepo->findOneBy(['code' => 'id-quia']);
 $breweryB = $breweryRepo->findOneBy(['name' => 'Dietrich Group']);
 $this->assertSame($breweryA, $breweryB);</code></pre>
@@ -651,7 +727,7 @@ $this->assertSame($breweryA, $breweryB);</code></pre>
           </section>
 
           <section>
-            <h4>Detach versus clear</h4>
+            <h3>Detach versus clear</h3>
 
             3 ways to remove from the UOW:
 
@@ -669,22 +745,6 @@ $this->assertSame($breweryA, $breweryB);</code></pre>
           <section>
             <h4>Detach entities</h4>
 
-            Relation is ManyToOne<br />
-            No cascade detach!<br />
-            Not the same lifecycle<br />
-            Categories and Breweries exist without Beers
-
-            <pre><code class="bash">bin/console batch:import:beer beers_10k.csv --env=prod
-End: Time: 20.18s - Memory: 92.27M - Diff: 81.78M</code></pre>
-
-            <aside class="notes">
-              Don't want to cascade detach because other categories needs to stay in the UOW as they can be used by another Beer
-            </aside>
-          </section>
-
-          <section>
-            <h4>Detach entities</h4>
-
             <pre><code class="php">// EntityWriter
 $this->em->flush();
 $this->em->clear('BeerBundle\Entity\Beer');
@@ -693,8 +753,15 @@ foreach ($items as $item) {
   $this->em->detach($item);
 }</code></pre>
 
-            <pre><code class="bash">bin/console batch:import:beer beers_10k.csv --env=prod
+            <h4>Previously:</h4>
+            <pre><code class="bash">$ bin/console batch:import:beer beers_10k.csv --env=prod
+End: Time: 20.18s - Memory: 92.27M - Diff: 81.78M</code></pre>
+
+            <div class="fragment">
+              <h4>Now:</h4>
+              <pre><code class="bash">$ bin/console batch:import:beer beers_10k.csv --env=prod
 End: Time: 20.91s - Memory: 69.21M - Diff: 56.63M</code></pre>
+            </div>
 
             <aside class="notes">Same perf between loop detach and clear($className)</aside>
           </section>
@@ -707,15 +774,14 @@ End: Time: 20.91s - Memory: 69.21M - Diff: 56.63M</code></pre>
               <tr>
                 <td>Type</td>
                 <td>Instances Count</td>
-                <td>Cumulated Self Size (bytes)</td>
               </tr>
               </thead>
               <tbody>
-              <tr><td>Doctrine\ORM\Query\ResultSetMapping</td><td>11145</td><td>802440</td></tr>
-              <tr><td>Doctrine\ORM\Query\ParserResult</td><td>11139</td><td>802008</td></tr>
-              <tr><td>Doctrine\ORM\Query\Exec\SingleSelectExecutor</td><td>11139</td><td>802008</td></tr>
-              <tr><td>BeerBundle\Entity\Brewery</td><td>1000</td><td>72000</td></tr>
-              <tr><td>BeerBundle\Entity\Category</td><td>139</td><td>10008</td></tr>
+              <tr><td>Doctrine\ORM\Query\ResultSetMapping</td><td>11145</td></tr>
+              <tr><td>Doctrine\ORM\Query\ParserResult</td><td>11139</td></tr>
+              <tr><td>Doctrine\ORM\Query\Exec\SingleSelectExecutor</td><td>11139</td></tr>
+              <tr><td>BeerBundle\Entity\Brewery</td><td>1000</td></tr>
+              <tr><td>BeerBundle\Entity\Category</td><td>139</td></tr>
               </tbody>
             </table>
 
@@ -725,30 +791,53 @@ End: Time: 20.91s - Memory: 69.21M - Diff: 56.63M</code></pre>
           </section>
 
           <section>
+            <h3>Detach entities</h3>
+
+            No cascade detach!<br />
+            Relation is ManyToOne<br />
+            Not the same lifecycle<br />
+
+            <aside class="notes">
+              Categories and Breweries exist without Beers<br />
+              Don't want to cascade detach<br />
+              Categories needs to stay in the UOW as they can be used by another Beer
+            </aside>
+          </section>
+
+          <section>
             <h4>Clear UOW</h4>
             <pre><code class="php">// EntityWriter
 $this->em->flush();
 $this->em->clear();</code></pre>
 
+            <h4>Previously:</h4>
+            <pre><code class="bash">$ bin/console batch:import:beer beers_10k.csv --env=prod
+End: Time: 20.91s - Memory: 69.21M - Diff: 56.63M</code></pre>
+
             <div class="fragment">
-              <pre><code class="bash">bin/console batch:import:beer beers_10k.csv --env=prod
+              <h4>Now:</h4>
+              <pre><code class="bash">$ bin/console batch:import:beer beers_10k.csv --env=prod
 End: Time: 20.52s - Memory: 67.11M - Diff: 54.53M</code></pre>
             </div>
+          </section>
 
+          <section>
             <table class="small fragment">
               <thead>
               <tr>
                 <td>Type</td>
                 <td>Instances Count</td>
-                <td>Cumulated Self Size (bytes)</td>
               </tr>
               </thead>
               <tbody>
-              <tr><td>Doctrine\ORM\Query\ResultSetMapping</td><td>11145</td><td>802440</td></tr>
-              <tr><td>Doctrine\ORM\Query\ParserResult</td><td>11139</td><td>802008</td></tr>
-              <tr><td>Doctrine\ORM\Query\Exec\SingleSelectExecutor</td><td>11139</td><td>802008</td></tr>
+              <tr><td>Doctrine\ORM\Query\ResultSetMapping</td><td>11145</td></tr>
+              <tr><td>Doctrine\ORM\Query\ParserResult</td><td>11139</td></tr>
+              <tr><td>Doctrine\ORM\Query\Exec\SingleSelectExecutor</td><td>11139</td></tr>
               </tbody>
             </table>
+
+            <img src="resources/gif/the_office_oh_yeah.gif" />
+
             <aside class="notes">
               2M less than previous execution<br />
               No more Brewery nor Category<br />
@@ -756,9 +845,11 @@ End: Time: 20.52s - Memory: 67.11M - Diff: 54.53M</code></pre>
 	            10000 beers + 1000 breweries + 139 categories
             </aside>
           </section>
+        </section>
 
+        <section data-background="resources/pictures/background-hunt.png">
 	        <section>
-		        <h4>Let's hunt last memory leaks</h4>
+		        <h2>Let's hunt last memory leaks</h2>
 
 		        <ul>
 			        <li>SingleSelectExecutor: Executes SQL statement from DQL select statement</li>
@@ -824,21 +915,7 @@ $qb->andWhere(
 
 $results = $qb->getQuery()->execute();</code></pre>
 
-		        <pre class="fragment"><code class="php">public function createQueryBuilder() {
-  return new QueryBuilder($this);
-}</code></pre>
-
-		        <pre class="fragment"><code class="php">public function getQuery() {
-  $parameters = clone $this->parameters;
-  $query = $this->_em->createQuery($this->getDQL())
-        ...
-}</code></pre>
-
-		        <pre class="fragment"><code class="php">public function createQuery($dql = '') {
-    $query = new Query($this);
-
-    return $query;
-}</code></pre>
+            TODO: Affichage du DQL
 	        </section>
 
 	        <section>
@@ -852,13 +929,20 @@ $qb->setParameter('code', $code);
 
 $results = $qb->getQuery()->execute();</code></pre>
 
-		        <pre><code class="bash">bin/console batch:import:beer --env=prod
+            TODO: Affichage du DQL
+
+	        </section>
+
+          <section>
+            <pre><code class="bash">$ bin/console batch:import:beer --env=prod
 End: Time: 17.35s - Memory: 16.78M - Diff: 6.29M</code></pre>
 
-		        <aside class="notes">
-			        No more memory leak at this point!
-		        </aside>
-	        </section>
+            TODO: Display memory summary
+
+            <aside class="notes">
+              No more memory leak at this point!
+            </aside>
+          </section>
 
 	        <section>
 		        <h4>How to query entities?!</h4>
@@ -871,7 +955,7 @@ End: Time: 17.35s - Memory: 16.78M - Diff: 6.29M</code></pre>
 			        <li>Only work on a single table</li>
 		        </ul>
 
-		        <pre><code class="bash">bin/console batch:import:beer --env=prod
+		        <pre><code class="bash">$ bin/console batch:import:beer --env=prod
 End: Time: 14.38s - Memory: 14.68M - Diff: 3.89M</code></pre>
 
 		        <aside class="notes">
