@@ -20,7 +20,8 @@ ul.contacts li img {
 
 .reveal pre code {
     max-height: 450px;
-    font-size: 20px;
+    font-size: 18px;
+    line-height: normal;
 }
 
 .reveal table td {

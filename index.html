@@ -474,7 +474,13 @@ Entity "id-quia" not valid: This value is too long.
         <section data-background="resources/pictures/background-leak.jpg">
           <section>
             <h2>Memory leaks</h2>
-            TODO: Put CSV file Beers.csv
+
+            <pre><code class="yaml small">code;name;description;brewery;category
+kronenbourg;Kronenbourg;A beer to piss;kronenbourg_brewery;piss
+1664;1664;The high level of Kronenbourg brewery;kronenbourg_brewery;piss
+stella;Stella Artois;A beer that does not respect its country;Artois;pils
+33_export;33 Export;The best compitor of Kronenbourg;heineken;piss
+bud_light;Budweiser;A Kronenbourg made by Americans;anheuser-bush;pale_lager</code></pre>
           </section>
 
           <section>
@@ -793,9 +799,13 @@ End: Time: 20.91s - Memory: 69.21M - Diff: 56.63M</code></pre>
           <section>
             <h3>Detach entities</h3>
 
-            No cascade detach!<br />
-            Relation is ManyToOne<br />
-            Not the same lifecycle<br />
+            <img src="resources/gif/the_office_oh_yeah.gif" />
+
+            <ul class="fragment">
+              <li>Categories and Breweries are not detached</li>
+              <li>No cascade detach (ManyToOne)</li>
+              <li>Not the same lifecycle</li>
+            </ul>
 
             <aside class="notes">
               Categories and Breweries exist without Beers<br />
@@ -822,7 +832,8 @@ End: Time: 20.52s - Memory: 67.11M - Diff: 54.53M</code></pre>
           </section>
 
           <section>
-            <table class="small fragment">
+            <h4>Clear UOW</h4>
+            <table class="small">
               <thead>
               <tr>
                 <td>Type</td>
@@ -836,7 +847,7 @@ End: Time: 20.52s - Memory: 67.11M - Diff: 54.53M</code></pre>
               </tbody>
             </table>
 
-            <img src="resources/gif/the_office_oh_yeah.gif" />
+            <img src="resources/gif/barney_stinson_good.gif" />
 
             <aside class="notes">
               2M less than previous execution<br />
@@ -847,15 +858,21 @@ End: Time: 20.52s - Memory: 67.11M - Diff: 54.53M</code></pre>
           </section>
         </section>
 
-        <section data-background="resources/pictures/background-hunt.png">
+        <section data-background="resources/pictures/background-hunt.jpg">
 	        <section>
 		        <h2>Let's hunt last memory leaks</h2>
 
-		        <ul>
-			        <li>SingleSelectExecutor: Executes SQL statement from DQL select statement</li>
-			        <li>ResultSetMapping: Maps results set of SQL query to Doctrine results</li>
-			        <li>ParserResult: Encapsulates results from DQL parsing</li>
+		        <ul class="fragment">
+			        <li class="fragment grow">SingleSelectExecutor</li>
+			        <li class="fragment grow">ResultSetMapping</li>
+			        <li class="fragment grow">ParserResult</li>
 		        </ul>
+
+            <aside class="notes">
+              1. Executes SQL statement from DQL select statement<br />
+              2. Maps results set of SQL query to Doctrine results<br />
+              3. Encapsulates results from DQL parsing
+            </aside>
 	        </section>
 
 	        <section>
@@ -865,22 +882,24 @@ End: Time: 20.52s - Memory: 67.11M - Diff: 54.53M</code></pre>
 
 		        <pre><code>Path from 0x7fa5eaa56280
 0x7fa5d8f14c00
-^
+&uarr;
 _resultSetMapping (0x7fa5dc2af5c8)
-^
+&uarr;
 0 (0x7fa5d9a11000)
-^
+&uarr;
 sf_orm_default_a1536898803dafe5169a1bd008aad667f3b84c092cc24b9f4a3483342a35e6d6[72581bcf67100f31f4179c031c0fa291][1] (0x7fa5d8ee45e0)
-^
+&uarr;
 data (0x7fa5dc5b9b00)
-^
+&uarr;
 doctrine_cache.providers.doctrine.orm.default_query_cache (0x7fa5dc1d3060)
-^
+&uarr;
 services (0x7fa5dc1d3780)
-^
+&uarr;
 container (0x7fa5eaa56280)</code></pre>
 
-		        Object linked to ORM\Query
+		        <aside class="notes">
+              Object linked to ORM\Query
+            </aside>
 
 	        </section>
 
@@ -893,16 +912,13 @@ container (0x7fa5eaa56280)</code></pre>
         $qb->expr()->like('c.code', $qb->expr()->literal($code))
     );
 
-
     $results = $qb->getQuery()->execute();
-
-    $count = count($results);
-    if ($count !== 1) {
-        return null;
-    }
-
+    //...
     return $results[0];
 }</code></pre>
+
+            <img src="resources/gif/mister_bean_nawak.gif" class="fragment" />
+
 	        </section>
 
 	        <section>
@@ -934,6 +950,29 @@ $results = $qb->getQuery()->execute();</code></pre>
 	        </section>
 
           <section>
+            <h4>How to query entities?!</h4>
+
+            <pre><code class="php">public function findOneByIdentifier(string $code) {
+    return $this->findOneBy(['code' => $code]);
+}</code></pre>
+            <ul>
+              <li>Uses BasicEntityPersister</li>
+              <li>Only work on a single table</li>
+            </ul>
+
+            <pre><code class="bash">$ bin/console batch:import:beer --env=prod
+End: Time: 14.38s - Memory: 14.68M - Diff: 3.89M</code></pre>
+
+            <aside class="notes">
+              Persister instead of create DQL queries<br />
+              Far more efficient<br />
+              More about performance
+            </aside>
+          </section>
+
+          <section>
+            <h4>Analyze memory</h4>
+
             <pre><code class="bash">$ bin/console batch:import:beer --env=prod
 End: Time: 17.35s - Memory: 16.78M - Diff: 6.29M</code></pre>
 
@@ -944,43 +983,44 @@ End: Time: 17.35s - Memory: 16.78M - Diff: 6.29M</code></pre>
             </aside>
           </section>
 
-	        <section>
-		        <h4>How to query entities?!</h4>
+        </section>
 
-		        <pre><code class="php">public function findOneByIdentifier(string $code) {
-    return $this->findOneBy(['code' => $code]);
-}</code></pre>
-		        <ul>
-			        <li>Uses BasicEntityPersister</li>
-			        <li>Only work on a single table</li>
-		        </ul>
+        <section data-background="resources/pictures/background-import-summary.jpg">
+          <section>
+            <h2>Mission accomplished!</h2>
 
-		        <pre><code class="bash">$ bin/console batch:import:beer --env=prod
-End: Time: 14.38s - Memory: 14.68M - Diff: 3.89M</code></pre>
+            <img src="resources/gif/cat_shakes.gif" />
+          </section>
 
-		        <aside class="notes">
-			        Persister instead of create DQL queries<br />
-			        Far more efficient<br />
-			        More about performance
-		        </aside>
-	        </section>
+          <section>
+            <h3>In a nutshell</h3>
+            <ul>
+              <li class="fragment">Use production environment</li>
+              <li class="fragment">Find the right moment to flush</li>
+              <li class="fragment">Rework validation</li>
+              <li class="fragment">Change Tracking Policy</li>
+              <li class="fragment">Clear UOW</li>
+              <li class="fragment">Take care at your queries</li>
+            </ul>
+          </section>
 
         </section>
 
-        <section>
-          <h4>Export</h4>
-
-          1. findAll()<br />
-          2. findById() + limit<br />
-          3. iterate() method<br />
-        </section>
-
-        <section>
+        <section data-background="resources/pictures/background-whats_next.jpg">
           <h2>What's next?</h2>
 
-          Multi import? (beers + breweries) -> Quick presentation
-          Improve performance? (test "Change tracking policy" -> notify)
-          Mass Delete?
+          <ul>
+            <li>Export</li>
+            <li>Multi import</li>
+            <li>Improve performance</li>
+            <li>Mass Delete</li>
+          </ul>
+
+          <aside class="notes">
+            1. findAll(), findById() + offset/limit, iterate method<br />
+            2. Import brewery + beers at the same time<br />
+            3. Change Tracking Policy using notify
+          </aside>
         </section>
 
       </div>
