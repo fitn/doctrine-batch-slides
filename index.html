@@ -256,7 +256,7 @@ public function findOrCreateCategory(string $code) {
 
         <section data-background="resources/pictures/background-brewery.jpg">
           <section>
-            <h2>Import breweries (500 lines)</h2>
+            <h2>Import breweries (1000 lines)</h2>
 
             <pre><code class="yaml">code;name;description
 id-quia;Dietrich Group;I know THAT
@@ -270,10 +270,12 @@ oakkham;Oakham Ales;The famous Oakham brewery</code></pre>
             <h4>Launch breweries import</h4>
             <pre class="fragment"><code class="bash">$ bin/console batch:import:brewery breweries.csv
 Start: Memory: 12.58M
+1001 entity written
 End: Time: 25.77s - Memory: 29.36M - Diff: 16.78M</code></pre>
 
             <pre class="fragment"><code class="bash">$ bin/console batch:import:brewery breweries.csv --env=prod
 Start: Memory: 10.49M
+1001 entity written
 End: Time: 22.2s - Memory: 20.97M - Diff: 10.48M</code></pre>
 
             <aside class="notes">
@@ -378,7 +380,7 @@ End: Time: 22.2s - Memory: 20.97M - Diff: 10.48M</code></pre>
 
         <section data-background="resources/pictures/background-update.jpg">
           <section>
-            <h2>Update and Change Tracking Policy</h2>
+            <h2>Update Breweries</h2>
 
             <pre class="fragment"><code class="yaml">code;name
 id-quia;"Dietrich GroupDietrich GroupDietrich Group[...]Dietrich Group"</code></pre>
@@ -601,7 +603,8 @@ PHP Fatal error:
           <section>
             <h4>Dump memory content</h4>
 
-            <pre><code class="php">// PHP
+            <pre><code class="php">// EntityWriter
+$this->em->flush();
 meminfo_info_dump(fopen('/tmp/doctrine_batch.log', 'w'));</code></pre>
 
             <pre class="fragment"><code class="json">{
@@ -624,7 +627,11 @@ meminfo_info_dump(fopen('/tmp/doctrine_batch.log', 'w'));</code></pre>
   }
 }</code></pre>
 
-            <aside class="notes"></aside>
+            <aside class="notes">
+              Expliquer pourquoi le dump est fait là<br />
+              Sorte de fin d'une boucle.<br />
+              Et puis ça m'arrange car c'est là qu'est le memory leak
+            </aside>
           </section>
 
           <section>
@@ -1063,6 +1070,8 @@ End: Time: 2297.23s - Memory: 14.68M - Diff: 4.19M</code></pre>
           <h2>Thank you</h2>
 
           <img src="resources/gif/piti_chat_milk.gif" class="fragment" height="300" />
+
+          <a href="https://github.com/fitn/doctrine-batch/">https://github.com/fitn/doctrine-batch/</a>
 
           <aside class="notes">
             Retour d'xp d'Akeneo<br />
