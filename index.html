@@ -373,6 +373,9 @@ End: Time: 1.79s - Memory: 20.97M - Diff: 10.48M</code></pre>
 1001 entity written
 End: Time: 22.2s - Memory: 20.97M - Diff: 10.48M</code></pre>
           </section>
+
+          <section data-background="resources/gif/waouh.gif"></section>
+
         </section>
 
         <section data-background="resources/pictures/background-update.jpg">
@@ -416,7 +419,7 @@ Entity "id-quia" not valid: This value is too long.
             <img src="resources/img/doctrine_batch_schema_step_3.png" class="schema" />
 
             <aside class="notes">
-              Explication du schéma<br />
+              Explication du schéma + UOW<br />
               2 façons de faire pour corriger ce problème.<br />
               Détacher mon entity de l'UOW afin qu'elle ne soit pas prise en compte (souvent coûteux en temps de le faire ligne par ligne
             </aside>
@@ -443,9 +446,9 @@ Entity "id-quia" not valid: This value is too long.
             <h3>Change Tracking Policy</h3>
 
             <ul>
-              <li>Deferred implicit (default)</li>
-              <li>Deferred explicit</li>
-              <li>Notify</li>
+              <li class="fragment">Deferred implicit (default)</li>
+              <li class="fragment">Deferred explicit</li>
+              <li class="fragment">Notify</li>
             </ul>
 
             <aside class="notes">
@@ -473,13 +476,21 @@ Entity "id-quia" not valid: This value is too long.
             </aside>
 
           </section>
+
+          <section>
+            <h4>Relaunch the job</h4>
+
+            TODO: Display results
+
+            <img src="resources/gif/dancing_zebra.gif" />
+          </section>
         </section>
 
         <section data-background="resources/pictures/background-leak.jpg">
           <section>
             <h2>Memory leaks</h2>
 
-            <pre><code class="yaml small">code;name;description;brewery;category
+            <pre class="fragment"><code class="yaml small">code;name;description;brewery;category
 kronenbourg;Kronenbourg;A beer to piss;kronenbourg_brewery;piss
 1664;1664;The high level of Kronenbourg brewery;kronenbourg_brewery;piss
 stella;Stella Artois;A beer that does not respect its country;Artois;pils
@@ -515,7 +526,7 @@ PHP Fatal error:
           <section>
             <h4>Memory consumption</h4>
 
-            <img src="resources/img/doctrine-memory-leak-step3.png" />
+            <img src="resources/img/chart-doctrine-memory-leak.png" />
 
             <aside class="notes">
               Every 5000 items<br />
@@ -633,6 +644,7 @@ meminfo_info_dump(fopen('/tmp/doctrine_batch.log', 'w'));</code></pre>
             </div>
 
             <aside class="notes">
+              Could be Proxies\__CG__\BeerBundle\Entity\Brewery<br />
               La taille mémoire cumulée des objets est également disponible mais masquée ici
             </aside>
           </section>
@@ -640,7 +652,7 @@ meminfo_info_dump(fopen('/tmp/doctrine_batch.log', 'w'));</code></pre>
           <section>
             <h4>Analyze memory for an object type</h4>
 
-            <pre><code class="bash">$ bin/analyzer query -f "class=BeerBundle\\Entity\\Beer" -v /tmp/doctrine_batch.log</code></pre>
+            <pre><code class="bash smaller">$ bin/analyzer query -f "class=BeerBundle\\Entity\\Beer" -v /tmp/doctrine_batch.log</code></pre>
 
             <div class="fragment">
               <table>
@@ -670,7 +682,6 @@ meminfo_info_dump(fopen('/tmp/doctrine_batch.log', 'w'));</code></pre>
                 </tbody>
               </table>
             </div>
-
           </section>
 
           <section>
@@ -694,13 +705,15 @@ services (0x7f64af9c1280)
 &uarr;
 container (0x7f64be256280)</code></pre>
 
-            <aside class="notes">
-              Pourquoi est-ce que l'objet tout en haut n'est pas celui que je recherche?
-            </aside>
+            <aside class="notes"></aside>
           </section>
 
           <section>
             <img src="resources/gif/oh_my_god_afraid.gif" />
+
+            <aside class="notes">
+              Ask if everything is clear!!!
+            </aside>
           </section>
 
         </section>
@@ -964,7 +977,7 @@ $results = $qb->getQuery()->execute();</code></pre>
               <li>Only work on a single table</li>
             </ul>
 
-            <pre><code class="bash">$ bin/console batch:import:beer --env=prod
+            <pre><code class="bash">$ bin/console batch:import:beer beers_10k.csv --env=prod
 End: Time: 14.38s - Memory: 14.68M - Diff: 3.89M</code></pre>
 
             <aside class="notes">
@@ -977,13 +990,15 @@ End: Time: 14.38s - Memory: 14.68M - Diff: 3.89M</code></pre>
           <section>
             <h4>Analyze memory</h4>
 
-            <pre><code class="bash">$ bin/console batch:import:beer --env=prod
-End: Time: 17.35s - Memory: 16.78M - Diff: 6.29M</code></pre>
-
-            TODO: Display memory summary
+            <pre><code class="bash">$ bin/console batch:import:beer beers_1M.csv --env=prod
+Memory: 10.49M
+End: Time: 2297.23s - Memory: 14.68M - Diff: 4.19M</code></pre>
 
             <aside class="notes">
-              No more memory leak at this point!
+              Juste une petite modification sur le validateur<br />
+              puisqu'il faut nettoyer le tableau de code uniques après chaque flush<br />
+              No more memory leak at this point!<br />
+              Don't know why there is so much entities of these types
             </aside>
           </section>
 
@@ -1024,6 +1039,19 @@ End: Time: 17.35s - Memory: 16.78M - Diff: 6.29M</code></pre>
             1. findAll(), findById() + offset/limit, iterate method<br />
             2. Import brewery + beers at the same time<br />
             3. Change Tracking Policy using notify
+          </aside>
+        </section>
+
+        <section data-background="resources/pictures/background-thanks.jpg">
+
+          <h2>Thank you</h2>
+
+          <img src="resources/gif/piti_chat_milk.gif" class="fragment" height="300" />
+
+          <aside class="notes">
+            Retour d'xp d'Akeneo<br />
+            J'espère que vous avez appris quelques petits trucs<br />
+            Et que vous aurez envie de creuser un peu plus doctrine
           </aside>
         </section>
 
