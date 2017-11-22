@@ -374,8 +374,6 @@ End: Time: 1.79s - Memory: 20.97M - Diff: 10.48M</code></pre>
 End: Time: 22.2s - Memory: 20.97M - Diff: 10.48M</code></pre>
           </section>
 
-          <section data-background="resources/gif/waouh.gif"></section>
-
         </section>
 
         <section data-background="resources/pictures/background-update.jpg">
@@ -480,9 +478,19 @@ Entity "id-quia" not valid: This value is too long.
           <section>
             <h4>Relaunch the job</h4>
 
-            TODO: Display results
+            <pre><code class="bash">$ bin/console batch:import:brewery breweries_update.csv --env=prod
+Memory: 10.49M
+Entity "id-quia" not valid: This value is too long. It should have 100 characters or less.
+0 entity written
+End: Time: 0.05s - Memory: 14.68M - Diff: 4.19M</code></pre>
 
             <img src="resources/gif/dancing_zebra.gif" />
+
+            <aside class="notes">
+              Niveau performance, la différence se verra sur une grosse volumétrie<br />
+              Si vous avez des erreurs et que vous ne persistez que la moitié des entités<br />
+              Le calcul du changeset ne sera pas fait sur toutes ces entités
+            </aside>
           </section>
         </section>
 
@@ -917,7 +925,6 @@ container (0x7fa5eaa56280)</code></pre>
 		        <aside class="notes">
               Object linked to ORM\Query
             </aside>
-
 	        </section>
 
 	        <section>
@@ -948,7 +955,10 @@ $qb->andWhere(
 
 $results = $qb->getQuery()->execute();</code></pre>
 
-            TODO: Affichage du DQL
+            <div class="fragment">
+              <h4>DQL</h4>
+              <pre><code class="sql smaller">SELECT c FROM BeerBundle\Entity\Beer c WHERE c.code LIKE 'dolorum-aliquid-maiores'</code></pre>
+            </div>
 	        </section>
 
 	        <section>
@@ -962,7 +972,10 @@ $qb->setParameter('code', $code);
 
 $results = $qb->getQuery()->execute();</code></pre>
 
-            TODO: Affichage du DQL
+            <div class="fragment">
+              <h4>DQL</h4>
+              <pre><code class="sql">SELECT c FROM BeerBundle\Entity\Beer c WHERE c.code LIKE :code</code></pre>
+            </div>
 
 	        </section>
 
@@ -983,7 +996,8 @@ End: Time: 14.38s - Memory: 14.68M - Diff: 3.89M</code></pre>
             <aside class="notes">
               Persister instead of create DQL queries<br />
               Far more efficient<br />
-              More about performance
+              More about performance<br />
+              14.68M
             </aside>
           </section>
 
@@ -993,6 +1007,8 @@ End: Time: 14.38s - Memory: 14.68M - Diff: 3.89M</code></pre>
             <pre><code class="bash">$ bin/console batch:import:beer beers_1M.csv --env=prod
 Memory: 10.49M
 End: Time: 2297.23s - Memory: 14.68M - Diff: 4.19M</code></pre>
+
+            <img src="resources/gif/waouh.gif" />
 
             <aside class="notes">
               Juste une petite modification sur le validateur<br />
