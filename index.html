@@ -286,14 +286,18 @@ End: Time: 22.2s - Memory: 20.97M - Diff: 10.48M</code></pre>
             <h4>What is happening?</h4>
 
             <pre><code class="sql">[...]
+DEBUG: SELECT [...] FROM brewery b0_ WHERE b0_.code LIKE 'id-quia'
+DEBUG: SELECT [...] FROM brewery t0 WHERE t0.code = ? ["id-quia"]
 DEBUG: "START TRANSACTION" [] []
 DEBUG: INSERT INTO brewery [...] []
 DEBUG: "COMMIT" [] []
-DEBUG: SELECT [...] FROM brewery b0_ WHERE b0_.code LIKE 'omnis-sed'
-DEBUG: SELECT [...] FROM brewery t0 WHERE t0.code = ? ["omnis-sed"]
+
+DEBUG: SELECT [...] FROM brewery b0_ WHERE b0_.code LIKE 'abbey-ales'
+DEBUG: SELECT [...] FROM brewery t0 WHERE t0.code = ? ["abbey-ales"]
 DEBUG: "START TRANSACTION" [] []
 DEBUG: INSERT INTO brewery [...] []
-DEBUG: "COMMIT" [] []</code></pre>
+DEBUG: "COMMIT" [] []
+[...]</code></pre>
 
             <aside class="notes">
               - 2 queries per item<br />
@@ -323,13 +327,13 @@ DEBUG: "COMMIT" [] []</code></pre>
           <section>
 	          <h4>Validation process: batch size 1</h4>
 
-	          <img src="resources/img/doctrine_step1_batch_size1.png" class="schema" />
+	          <img src="resources/img/doctrine_batch_schema_step1_batchsize_1.png" class="schema" />
           </section>
 
 	        <section>
 		        <h4>Validation process: batch size 100</h4>
 
-		        <img src="resources/img/doctrine_step1_batch_size100.png" class="schema" />
+		        <img src="resources/img/doctrine_batch_schema_step1_batchsize_100.png" class="schema" />
 
 		        <aside class="notes">
 			        Think about another way for validators!!!
