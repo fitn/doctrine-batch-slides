@@ -1248,10 +1248,12 @@ private function getResults() {
             <pre><code class="bash">bin/console batch:export:beer beers.csv --env=prod
 End: Time: 112.78s - Memory: 14.68M - Diff: 4.19M</code></pre>
 
-            <div>Inconvenience: Once cursor is opened, not possible to have any other SELECT operations</div>
+            <div class="right">
+              <div>Inconvenience: Once cursor is opened, not possible to have any other SELECT operations</div>
 
-            <pre><code class="bash smaller">[PDOException]
+              <pre><code class="bash smaller">[PDOException]
   SQLSTATE[HY000]: [...]Cannot execute queries while other unbuffered queries are active.</code></pre>
+            </div>
 
             <aside class="notes">
               On peut imaginer loader en cache les objets catégories et breweries avant d'itérer<br />
