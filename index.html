@@ -1045,6 +1045,262 @@ End: Time: 2297.23s - Memory: 14.68M - Diff: 4.19M</code></pre>
               <li class="fragment">Take care at your queries</li>
             </ul>
           </section>
+        </section>
+
+        <section data-background="resources/pictures/background-export.jpg">
+          <section>
+            <h2>What about export!</h2>
+          </section>
+
+          <section>
+            <h4>Reader</h4>
+
+            <pre><code class="php">public function read() {
+    if (null === $this->results) {
+        $this->results = $this->getResults();
+    }
+
+    if (null !== $result = $this->results->current()) {
+        $this->results->next();
+    }
+
+    return $result;
+}
+
+private function getResults() {
+    $results = $this->repository->findAll();
+
+    return new \ArrayIterator($results);
+}</code></pre>
+          </section>
+
+          <section>
+            <h4>Launch the export</h4>
+
+            <pre><code class="bash">$ bin/console batch:export:beer beers.csv --env=prod
+Memory: 10.49M
+End: Time: 1.05s - Memory: 46.14M - Diff: 35.65M</code></pre>
+
+            <table class="fragment small">
+              <thead>
+              <tr>
+                <td>Type</td>
+                <td>Instances Count</td>
+              </tr>
+              </thead>
+              <tbody>
+              <tr><td>Proxies\__CG__\BeerBundle\Entity\Brewery</td><td>21000</td></tr>
+              <tr><td>Proxies\__CG__\BeerBundle\Entity\Category</td><td>20139</td></tr>
+              <tr><td>BeerBundle\Entity\Beer</td><td>10000</td></tr>
+              </tbody>
+            </table>
+          </section>
+
+          <section>
+            <h4>Clear the UOW</h4>
+
+            <pre><code class="php">private function getResults()
+{
+    $results = $this->repository->findAll();
+    $this->repository->clear();
+
+    return new \ArrayIterator($results);
+}</code></pre>
+
+            <pre class="fragment"><code class="bash">bin/console batch:export:beer beers.csv --env=prod
+Memory: 10.49M
+End: Time: 1.32s - Memory: 46.14M - Diff: 35.65M</code></pre>
+
+            <table class="fragment small">
+              <thead>
+              <tr>
+                <td>Type</td>
+                <td>Instances Count</td>
+              </tr>
+              </thead>
+              <tbody>
+              <tr><td>Proxies\__CG__\BeerBundle\Entity\Brewery</td><td>1000</td></tr>
+              <tr><td>Proxies\__CG__\BeerBundle\Entity\Category</td><td>139</td></tr>
+              </tbody>
+            </table>
+
+            <aside class="notes">
+              Clear since repository do a clear($className)
+            </aside>
+          </section>
+
+          <section>
+            <h4>Find All</h4>
+
+            <img src="resources/gif/barney_stinson_no.gif" />
+
+            <div class="fragment">
+              <ul>
+                <li>Take care about findAll</li>
+                <li>At least use findBy method</li>
+              </ul>
+
+              <pre><code class="php smaller">public function findBy(array $criteria, array $orderBy, $limit, $offset);</code></pre>
+            </div>
+
+            <aside class="notes">
+              1. This should never be used <br />
+              1. Si create autorisé, vous devez faire attention à la volumétrie<br />
+              2. findBy uses offset and limit<br />
+            </aside>
+          </section>
+
+          <section>
+            <h4>How to do SQL query on huge table?!</h4>
+
+            <ul>
+              <li>Read offset/limit</li>
+              <li>Database cursor</li>
+              <li>Search after</li>
+            </ul>
+          </section>
+
+          <section>
+            <h4>Read offset/limit</h4>
+
+            <img src="resources/img/sql_read_offset_limit.png" />
+
+            <h5>Linear increase</h5>
+            <h5>Exponential cost per volume</h5>
+
+            <aside class="notes"></aside>
+          </section>
+
+          <section>
+            <h4>Read offset/limit</h4>
+
+            <pre><code class="sql">mysql> SELECT * FROM beer;
+1611768 rows in set (3,92 sec)</code></pre>
+
+            <pre class="fragment"><code class="sql">mysql> SELECT * FROM beer LIMIT 0, 100;
+100 rows in set (0,00 sec)</code></pre>
+
+            <pre class="fragment"><code class="sql">mysql> SELECT * FROM beer LIMIT 100000, 100;
+100 rows in set (0,09 sec)</code></pre>
+
+            <pre class="fragment"><code class="sql">mysql> SELECT * FROM beer LIMIT 1000000, 100;
+100 rows in set (0,83 sec)</code></pre>
+
+            <aside class="notes">
+              Besoin de lire le 1er M de lignes pour renvoyer les 100 prochaines<br />
+              $qb->setFirstResult et setMaxResult en doctrine
+            </aside>
+          </section>
+
+          <section>
+            <h4>Database cursor</h4>
+
+            <img src="resources/img/sql_read_db_cursor.png" />
+
+            <h5>No increase</h5>
+            <h5>Linear cost per volume</h5>
+
+            <aside class="notes">
+              once the query had been launched<br />
+              the results are made available one by one to the client that launched the query
+            </aside>
+          </section>
+
+          <section>
+            <h4>Database cursor</h4>
+
+            <pre><code class="php">public function __construct(EntityManager $em) {
+        $em->getConnection()
+            ->getWrappedConnection()
+            ->setAttribute(\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
+        $this->repository = $em->getRepository('BeerBundle\Entity\Beer');
+}
+
+public function read() {
+    //...
+    $result = $this->results->next();
+    if (null !== $result) {
+        if (++$this->readCount % 100 === 0)
+            $this->repository->clear();
+        return $result[0];
+    }
+}
+
+private function getResults() {
+    $qb = $this->repository->createQueryBuilder('b');
+    return $qb->getQuery()->iterate();
+}</code></pre>
+          </section>
+
+          <section>
+            <h3>Database cursor</h3>
+
+            <pre><code class="bash">bin/console batch:export:beer beers.csv --env=prod
+End: Time: 112.78s - Memory: 14.68M - Diff: 4.19M</code></pre>
+
+            <div>Inconvenience: Once cursor is opened, not possible to have any other SELECT operations</div>
+
+            <pre><code class="bash smaller">[PDOException]
+  SQLSTATE[HY000]: [...]Cannot execute queries while other unbuffered queries are active.</code></pre>
+
+            <aside class="notes">
+              On peut imaginer loader en cache les objets catégories et breweries avant d'itérer<br />
+              Avec un findAll()...
+            </aside>
+          </section>
+
+          <section>
+            <h4>Search after</h4>
+
+            <img src="resources/img/sql_read_search_after.png" />
+
+            <h5>No increase</h5>
+            <h5>Linear cost per volume</h5>
+
+            <aside class="notes">
+              Le problème du Offset-limit c'est de tout relire depuis le début<br />
+              Si on recherche après notre dernier résultat, on enlève ce problème
+            </aside>
+          </section>
+
+          <section>
+            <h4>Search after</h4>
+
+            <pre class="fragment"><code class="sql">mysql> SELECT * FROM beer WHERE id > 0 ORDER BY id ASC LIMIT 100;
+100 rows in set (0,00 sec)</code></pre>
+
+            <pre class="fragment"><code class="sql">mysql> SELECT * FROM beer WHERE id > 100000 ORDER BY id ASC LIMIT 100;
+100 rows in set (0,00 sec)</code></pre>
+
+            <pre class="fragment"><code class="sql">mysql> SELECT * FROM beer WHERE id > 1000000 ORDER BY id ASC LIMIT 100;
+100 rows in set (0,00 sec)</code></pre>
+
+            <aside class="notes">
+              A vous d'implémenter ça dans le code maintenant :)
+            </aside>
+          </section>
+
+          <section>
+            <h4>Search after</h4>
+
+            <pre><code class="php">private function getResults($id = 0) {
+    $qb = $this->repository->createQueryBuilder('b');
+    $qb
+        ->where($qb->expr()->gt('b.id', ':id'))
+        ->orderBy('b.id')
+        ->setMaxResults(100)
+        ->setParameter('id', $id);
+
+    $this->results = $qb->getQuery()->execute();
+}</code></pre>
+
+            <pre><code class="bash fragment">$ bin/console batch:export:beer beers.csv --env=prod
+End: Time: 132.91s - Memory: 14.68M - Diff: 4.19M</code></pre>
+
+            <aside class="notes">
+              20 secondes de plus qu'avec le database cursor<br />
+            </aside>
+          </section>
 
         </section>
 
@@ -1052,7 +1308,6 @@ End: Time: 2297.23s - Memory: 14.68M - Diff: 4.19M</code></pre>
           <h2>What's next?</h2>
 
           <ul>
-            <li>Export</li>
             <li>Multi import</li>
             <li>Improve performance</li>
             <li>Mass Delete</li>
