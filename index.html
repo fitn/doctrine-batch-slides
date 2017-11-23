@@ -1130,7 +1130,7 @@ End: Time: 1.32s - Memory: 46.14M - Diff: 35.65M</code></pre>
           </section>
 
           <section>
-            <h4>Find All</h4>
+            <h2>Find All</h2>
 
             <img src="resources/gif/barney_stinson_no.gif" />
 
@@ -1160,13 +1160,18 @@ End: Time: 1.32s - Memory: 46.14M - Diff: 35.65M</code></pre>
             </ul>
           </section>
 
-          <section>
-            <h4>Read offset/limit</h4>
+          <section class="vsep left">
+            <div class="left">
+              <img src="resources/img/sql_read_offset_limit.png" />
+            </div>
 
-            <img src="resources/img/sql_read_offset_limit.png" />
-
-            <h5>Linear increase</h5>
-            <h5>Exponential cost per volume</h5>
+            <div class="right">
+              <h4>Read offset/limit</h4>
+              <ul>
+                <li>Linear increase</li>
+                <li>Exponential cost per volume</li>
+              </ul>
+            </div>
 
             <aside class="notes"></aside>
           </section>
@@ -1192,13 +1197,18 @@ End: Time: 1.32s - Memory: 46.14M - Diff: 35.65M</code></pre>
             </aside>
           </section>
 
-          <section>
-            <h4>Database cursor</h4>
+          <section class="vsep left">
+            <div class="left">
+              <img src="resources/img/sql_read_db_cursor.png" />
+            </div>
 
-            <img src="resources/img/sql_read_db_cursor.png" />
-
-            <h5>No increase</h5>
-            <h5>Linear cost per volume</h5>
+            <div class="right">
+              <h4>Database cursor</h4>
+              <ul>
+                <li>No increase</li>
+                <li>Linear cost per volume</li>
+              </ul>
+            </div>
 
             <aside class="notes">
               once the query had been launched<br />
@@ -1249,13 +1259,19 @@ End: Time: 112.78s - Memory: 14.68M - Diff: 4.19M</code></pre>
             </aside>
           </section>
 
-          <section>
+          <section class="vsep left">
             <h4>Search after</h4>
 
-            <img src="resources/img/sql_read_search_after.png" />
+            <div class="left">
+              <img src="resources/img/sql_read_search_after.png" />
+            </div>
 
-            <h5>No increase</h5>
-            <h5>Linear cost per volume</h5>
+            <div class="right">
+              <ul>
+                <li>No increase</li>
+                <li>Linear cost per volume</li>
+              </ul>
+            </div>
 
             <aside class="notes">
               Le problème du Offset-limit c'est de tout relire depuis le début<br />
@@ -1314,9 +1330,8 @@ End: Time: 132.91s - Memory: 14.68M - Diff: 4.19M</code></pre>
           </ul>
 
           <aside class="notes">
-            1. findAll(), findById() + offset/limit, iterate method<br />
-            2. Import brewery + beers at the same time<br />
-            3. Change Tracking Policy using notify
+            1. Import brewery + beers at the same time<br />
+            2. Change Tracking Policy using notify
           </aside>
         </section>
 
@@ -1324,7 +1339,7 @@ End: Time: 132.91s - Memory: 14.68M - Diff: 4.19M</code></pre>
 
           <h2>Thank you</h2>
 
-          <img src="resources/gif/piti_chat_milk.gif" class="fragment" height="300" />
+          <img src="resources/gif/piti_chat_milk.gif" height="300" />
 
           <a href="https://github.com/fitn/doctrine-batch/">https://github.com/fitn/doctrine-batch/</a>
 
