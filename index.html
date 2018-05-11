@@ -26,37 +26,39 @@
       <div class="slides">
 
         <section data-background="resources/pictures/background-plane_crash.jpg">
-          <h2>The worst best idea:</h2>
-          <h4>Doing batch with PHP and Doctrine</h4>
+          <section class="vsep left">
+            <div class="left">
+              <img src="resources/me.jpg" />
+            </div>
+            <div class="right">
+              <h2>Romain Monceau</h2>
+              <ul class="contacts">
+                <li><img src="resources/icons/twitter.png" class="icon" />@RomainMonceau</li>
+                <li><img src="resources/icons/birthday.png" class="icon" />~ 25 years old</li>
+                <li><img src="resources/icons/php.png" class="icon" />+15 years</li>
+                <li><img src="resources/icons/akeneo.png" class="icon" /> Lead Developer @Akeneo </li>
+              </ul>
+            </div>
 
-          <aside class="notes">
-            Pourquoi ce sujet ?<br />
-            PHP n'est pas fait pour le batch<br />
-            Doctrine n'est pas fait pour ça non plus<br />
-            Le but n'est pas de critiquer Doctrine ou de vous donner envie de l'utiliser<br />
-            Réutiliser votre stack permet de garder vos entités, validateurs, events, queries, etc.<br />
-            Réel retour d'XP sur des problèmes rencontrés<br />
-            J'espère que ce retour vous apprendra quelques astuces et pourra vous aider<br />
-          </aside>
-        </section>
+            <aside class="notes">
+              Beer addict<br />
+            </aside>
+          </section>
 
-        <section class="vsep left">
-          <div class="left">
-            <img src="resources/me.jpg" />
-          </div>
-          <div class="right">
-            <h2>Romain Monceau</h2>
-            <ul class="contacts">
-              <li><img src="resources/icons/twitter.png" class="icon" />@RomainMonceau</li>
-              <li><img src="resources/icons/birthday.png" class="icon" />25 years old</li>
-              <li><img src="resources/icons/php.png" class="icon" />+15 years</li>
-              <li><img src="resources/icons/akeneo.png" class="icon" /> Lead Developer @Akeneo </li>
-            </ul>
-          </div>
+          <section>
+            <h2>The worst best idea:</h2>
+            <h4>Doing batch with PHP and Doctrine</h4>
 
-          <aside class="notes">
-            Beer addict<br />
-          </aside>
+            <aside class="notes">
+              Pourquoi ce sujet ?<br />
+              PHP n'est pas fait pour le batch<br />
+              Doctrine n'est pas fait pour ça non plus<br />
+              Le but n'est pas de critiquer Doctrine ou de vous donner envie de l'utiliser<br />
+              Réutiliser votre stack permet de garder vos entités, validateurs, events, queries, etc.<br />
+              Réel retour d'XP sur des problèmes rencontrés<br />
+              J'espère que ce retour vous apprendra quelques astuces et pourra vous aider<br />
+            </aside>
+          </section>
         </section>
 
         <section data-background="resources/pictures/background-beers.jpg">
@@ -110,12 +112,55 @@
 		          Relation manyToOne unidirectional from Beer entity<br />
 	          </aside>
           </section>
+
           <section>
             <h4>Doctrine mapping: Beer.orm.yml</h4>
 
             <pre><code class="yml">BeerBundle\Entity\Beer:
   type: entity
   table: beer
+  repositoryClass: BeerBundle\Entity\Repository\EntityRepository
+  indexes:
+      searchcode_idx:
+          columns:
+              - code
+  uniqueConstraints:
+      searchunique_idx:
+          columns:
+              - code</code></pre>
+
+            <aside class="notes">Just a specific repository class to search entity from code</aside>
+          </section>
+
+          <section>
+            <h4>Entity Repository</h4>
+
+            <pre><code class="php">
+  // BeerBundle\Entity\Repository\EntityRepository
+
+  public function findOneByIdentifier(string $code)
+  {
+      $qb = $this->createQueryBuilder('c');
+      $qb->andWhere(
+          $qb->expr()->like('c.code', $qb->expr()->literal($code))
+      );
+
+
+      $results = $qb->getQuery()->execute();
+      // ...
+
+      return $results[0];
+  }
+            </code></pre>
+          </section>
+
+          <section>
+            <h4>Doctrine mapping: Beer.orm.yml</h4>
+
+            <pre><code class="yml">BeerBundle\Entity\Beer:
+  type: entity
+  table: beer
+  repositoryClass: BeerBundle\Entity\Repository\EntityRepository
   fields:
     id:
       [...]
@@ -154,106 +199,6 @@
           </section>
         </section>
 
-        <section data-background="resources/pictures/background-batch.jpg">
-
-          <section>
-            <h2>How doing batch?</h2>
-
-            <img src="resources/img/diagram-batch-job.svg" class="schema"/>
-
-            <aside class="notes">
-              Ca se présente globalement comme un ETL (Extract / Transform / Load)<br />
-              Stack maison largement inspiré d'Akeneo batch qui est un portage de Spring Batch (Java) en PHP<br />
-              Tout cela est lancé depuis une commande Symfony
-            </aside>
-          </section>
-
-          <section>
-            <h4>Job implementation</h4>
-
-            <pre><code class="php">public function execute() {
-    while (!$stopExecution) {
-        $readItem = $this->reader->read();
-        if (null === $readItem) {
-            $stopExecution = true; continue;
-        }
-
-        $processedItem = $this->processor->process($readItem);
-
-        if (null !== $processedItem) {
-            $itemsToWrite[] = $processedItem; $writeCount++;
-            if (0 === $writeCount % $this->batchSize) {
-                $this->writer->write($itemsToWrite);
-                $itemsToWrite = [];
-            }
-        }
-    }
-}</code></pre>
-          </section>
-
-          <section>
-            <h4>Reader</h4>
-            <pre><code class="php">public function __construct($filepath) {
-    $this->fd = fopen($filepath, 'r+');
-    $this->headers = fgetcsv($this->fd, null, ';');
-}
-
-public function read() {
-    $row = fgetcsv($this->fd, null, ';');
-    if (false === $row) {
-        return null;
-    }
-    return array_combine($this->headers, $row);
-}
-
-public function __destruct() {
-    fclose($this->fd);
-}</code></pre>
-          </section>
-
-          <section>
-            <h4>Processor</h4>
-            <pre><code class="php">public function process($item) {
-    $category = $this->findOrCreateCategory($item['code']);
-    $category->setName($item['name']);
-    $category->setDescription($item['description']);
-
-    return $category;
-}
-
-public function findOrCreateCategory(string $code) {
-    $entity = $this->repository->findOneByIdentifier($code);
-    if (null === $entity) {
-        $entity = new Category();
-        $entity->setCode($code);
-    }
-
-    return $entity;
-}</code></pre>
-          </section>
-
-          <section>
-            <h4>Writer</h4>
-
-            <pre><code class="php">public function write(array $items) {
-    $writeCount = 0;
-    foreach ($items as $item) {
-        $violations = $this->validator->validate($item);
-        if ($violations->count() === 0) {
-            $this->em->persist($item);
-            $writeCount++;
-        } else {
-            foreach ($violations as $violation) {
-                CommandLogger::error(...);
-            }
-        }
-    }
-
-    $this->em->flush();
-}</code></pre>
-          </section>
-        </section>
-
         <section data-background="resources/pictures/background-brewery.jpg">
           <section>
             <h2>Import breweries (1000 lines)</h2>
@@ -267,16 +212,74 @@ oakkham;Oakham Ales;The famous Oakham brewery</code></pre>
           </section>
 
           <section>
+            <h4>Command to import breweries</h4>
+            <pre><code class="php">// Read file content
+$fd = fopen($filepath, 'r+');
+$headers = fgetcsv($fd, null, ';');
+
+while ($csvRow = fgetcsv($fd, null, ';')) {
+    $csvRow = array_combine($headers, $csvRow);
+
+    // Process data row
+    $entity = $this->process($csvRow);
+
+    // Validate entity
+    $violations = $this->getValidator()->validate($entity);
+    if ($violations->count() === 0) {
+        // Write entity
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush();
+        $writeCount++;
+    } else {
+        $this->printViolations($violations, $entity);
+    }
+}</code></pre>
+
+            <aside class="notes">
+              Filepath as input
+            </aside>
+          </section>
+
+          <section>
+            <h4>Command to import breweries</h4>
+            <pre><code class="php">private function process(array $item)
+{
+    $brewery = $this->findOrCreateBrewery($item['code']);
+    $brewery->setName($item['name']);
+    $brewery->setDescription($item['description']);
+    $brewery->setAddress($item['address']);
+    // ...
+
+    return $brewery;
+}
+
+private function findOrCreateBrewery(string $code)
+{
+    $entity = $this->getRepository()->findOneByIdentifier($code);
+    if (null === $entity) {
+        $entity = new Brewery();
+        $entity->setCode($code);
+    }
+
+    return $entity;
+}</code></pre>
+
+            <aside class="notes">
+              Filepath as input
+            </aside>
+          </section>
+
+          <section>
             <h4>Launch breweries import</h4>
-            <pre class="fragment"><code class="bash">$ bin/console batch:import:brewery breweries.csv
-Start: Memory: 12.58M
+            <pre><code class="bash">$ bin/console batch:import:brewery breweries.csv
+Memory: 8.39M
 1001 entity written
-End: Time: 25.77s - Memory: 29.36M - Diff: 16.78M</code></pre>
+Time: 23.77s - Memory: 29.36M - Diff: 20.97M</code></pre>
 
             <pre class="fragment"><code class="bash">$ bin/console batch:import:brewery breweries.csv --env=prod
-Start: Memory: 10.49M
+Memory: 6.29M
 1001 entity written
-End: Time: 22.2s - Memory: 20.97M - Diff: 10.48M</code></pre>
+Time: 21.24s - Memory: 20.97M - Diff: 14.68M</code></pre>
 
             <aside class="notes">
               By default, batch size = 1<br />
@@ -288,7 +291,7 @@ End: Time: 22.2s - Memory: 20.97M - Diff: 10.48M</code></pre>
             <h4>What is happening?</h4>
 
             <pre><code class="sql">[...]
-DEBUG: SELECT [...] FROM brewery b0_ WHERE b0_.code LIKE 'id-quia'
+DEBUG: SELECT [...] FROM brewery b0_ WHERE b0_.code = 'id-quia'
 DEBUG: SELECT [...] FROM brewery t0 WHERE t0.code = ? ["id-quia"]
 DEBUG: "START TRANSACTION" [] []
 DEBUG: INSERT INTO brewery [...] []
@@ -302,7 +305,7 @@ DEBUG: "COMMIT" [] []
 [...]</code></pre>
 
             <aside class="notes">
-              - 2 queries per item<br />
+              - 2 queries per item (findOneBy -> l'autre c'est pour la validation et l'unicité)<br />
               - lot of transactions (1 per item)<br />
               Doctrine advices (and SGBD) is to flush sooner<br />
               Calculate the right ratio item per flush (You need to test)<br />
@@ -313,7 +316,22 @@ DEBUG: "COMMIT" [] []
           <section>
             <h4>Increase batch size to 100</h4>
 
-            <pre class="fragment"><code class="bash">$ bin/console batch:import:brewery breweries.csv --env=prod
+            <pre><code class="php">// Write entity
+$this->getEntityManager()->persist($entity);
+if (0 === ++$writeCount % 100) {
+    $this->getEntityManager()->flush();
+}</code></pre>
+
+            <aside class="notes">
+              I relaunch the same import<br />
+              2 times the same code in my file<br />
+            </aside>
+          </section>
+
+          <section>
+            <h4>Increase batch size to 100</h4>
+
+            <pre><code class="bash">$ bin/console batch:import:brewery breweries.csv --env=prod
 [Doctrine\DBAL\Exception\UniqueConstraintViolationException]
 [Doctrine\DBAL\Driver\PDOException]
 [PDOException]
@@ -321,8 +339,8 @@ DEBUG: "COMMIT" [] []
     1062 Duplicate entry 'id-quia' for key 'searchunique_idx'</code></pre>
 
             <aside class="notes">
-	            I relaunch the same import<br />
-	            2 times the same code in my file<br />
+              I relaunch the same import<br />
+              2 times the same code in my file<br />
             </aside>
           </section>
 
@@ -364,16 +382,18 @@ DEBUG: "COMMIT" [] []
 
           <section>
             <h4>Relaunch the import now!</h4>
-            <pre><code class="bash">Start: Memory: 10.49M
+            <pre><code class="bash">Memory: 10.49M
 Entity "id-quia" not valid:
   The value "id-quia" is already set in another entity
 1000 entity written
-End: Time: 1.79s - Memory: 20.97M - Diff: 10.48M</code></pre>
+Time: 1.79s - Memory: 20.97M - Diff: 10.48M</code></pre>
 
-	          <h5>Previous results</h5>
-            <pre><code class="bash">Start: Memory: 10.49M
+	          <h5>Previous results with batch size 1</h5>
+            <pre><code class="bash">Memory: 10.49M
 1001 entity written
-End: Time: 22.2s - Memory: 20.97M - Diff: 10.48M</code></pre>
+Time: 22.2s - Memory: 20.97M - Diff: 10.48M</code></pre>
+
+            <aside class="notes">Nette augmentation des perfs</aside>
           </section>
 
         </section>
@@ -382,8 +402,8 @@ End: Time: 22.2s - Memory: 20.97M - Diff: 10.48M</code></pre>
           <section>
             <h2>Update Breweries</h2>
 
-            <pre class="fragment"><code class="yaml">code;name
-id-quia;"Dietrich GroupDietrich GroupDietrich Group[...]Dietrich Group"</code></pre>
+            <pre><code class="yaml">code;name
+id-quia;Lorem ipsum dolor sit amet[...]</code></pre>
 
             <aside class="notes">
               Another file with 1 line<br />
@@ -446,9 +466,9 @@ Entity "id-quia" not valid: This value is too long.
             <h3>Change Tracking Policy</h3>
 
             <ul>
-              <li class="fragment">Deferred implicit (default)</li>
-              <li class="fragment">Deferred explicit</li>
-              <li class="fragment">Notify</li>
+              <li>Deferred implicit (default)</li>
+              <li>Deferred explicit</li>
+              <li>Notify</li>
             </ul>
 
             <aside class="notes">
@@ -480,11 +500,11 @@ Entity "id-quia" not valid: This value is too long.
           <section>
             <h4>Relaunch the job</h4>
 
-            <pre><code class="bash">$ bin/console batch:import:brewery breweries_update.csv --env=prod
+            <pre><code class="bash smaller">$ bin/console batch:import:brewery breweries_update.csv --env=prod
 Memory: 10.49M
-Entity "id-quia" not valid: This value is too long. It should have 100 characters or less.
+Entity "id-quia" not valid: This value is too long. It should have 100 chars or less.
 0 entity written
-End: Time: 0.05s - Memory: 14.68M - Diff: 4.19M</code></pre>
+Time: 0.05s - Memory: 14.68M - Diff: 4.19M</code></pre>
 
             <img src="resources/gif/dancing_zebra.gif" />
 
@@ -512,9 +532,9 @@ bud_light;Budweiser;A Kronenbourg made by Americans;anheuser-bush;pale_lager</co
             <h4>Import beers (10000 lines)</h4>
 
             <pre><code class="bash">$ bin/console batch:import:beer beers_10k.csv --env=prod
-Start: Memory: 10.49M
+Memory: 10.49M
 10000 entity written
-End: Time: 20.18s - Memory: 92.27M - Diff: 81.78M</code></pre>
+Time: 20.18s - Memory: 92.27M - Diff: 81.78M</code></pre>
 
             <div class="fragment">
               <h4>Import beers (20000 lines)</h4>
