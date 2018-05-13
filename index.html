@@ -382,16 +382,15 @@ if (0 === ++$writeCount % 100) {
 
           <section>
             <h4>Relaunch the import now!</h4>
-            <pre><code class="bash">Memory: 10.49M
-Entity "id-quia" not valid:
-  The value "id-quia" is already set in another entity
+            <pre><code class="bash">Memory: 6.29M
+Entity "id-quia" not valid: The value "id-quia" is already set in another entity
 1000 entity written
-Time: 1.79s - Memory: 20.97M - Diff: 10.48M</code></pre>
+Import - Time: 1.95s - Memory: 20.97M - Diff: 14.68M</code></pre>
 
 	          <h5>Previous results with batch size 1</h5>
-            <pre><code class="bash">Memory: 10.49M
+            <pre><code class="bash">Memory: 6.29M
 1001 entity written
-Time: 22.2s - Memory: 20.97M - Diff: 10.48M</code></pre>
+Time: 21.24s - Memory: 20.97M - Diff: 14.68M</code></pre>
 
             <aside class="notes">Nette augmentation des perfs</aside>
           </section>
@@ -415,7 +414,7 @@ id-quia;Lorem ipsum dolor sit amet[...]</code></pre>
             <h4>Update breweries</h4>
 
             <pre><code class="bash">$ bin/console batch:import:brewery breweries_update.csv --env=prod
-Memory: 10.49M
+Memory: 6.29M
 Entity "id-quia" not valid: This value is too long.
   It should have 100 characters or less.
 0 entity written
@@ -501,10 +500,10 @@ Entity "id-quia" not valid: This value is too long.
             <h4>Relaunch the job</h4>
 
             <pre><code class="bash smaller">$ bin/console batch:import:brewery breweries_update.csv --env=prod
-Memory: 10.49M
-Entity "id-quia" not valid: This value is too long. It should have 100 chars or less.
+Memory: 6.29M
+Entity "id-quia" not valid: This value is too long. It should have 100 characters or less.
 0 entity written
-Time: 0.05s - Memory: 14.68M - Diff: 4.19M</code></pre>
+Time: 0.05s - Memory: 14.68M - Diff: 8.39M</code></pre>
 
             <img src="resources/gif/dancing_zebra.gif" />
 
@@ -518,29 +517,27 @@ Time: 0.05s - Memory: 14.68M - Diff: 4.19M</code></pre>
 
         <section data-background="resources/pictures/background-leak.jpg">
           <section>
-            <h2>Memory leaks</h2>
+            <h2>Import Beers (10000k lines)</h2>
 
-            <pre class="fragment"><code class="yaml small">code;name;description;brewery;category
+            <pre><code class="yaml small">code;name;description;brewery;category
 kronenbourg;Kronenbourg;A beer to piss;kronenbourg_brewery;piss
-1664;1664;The high level of Kronenbourg brewery;kronenbourg_brewery;piss
 stella;Stella Artois;A beer that does not respect its country;Artois;pils
-33_export;33 Export;The best compitor of Kronenbourg;heineken;piss
-bud_light;Budweiser;A Kronenbourg made by Americans;anheuser-bush;pale_lager</code></pre>
+33_export;33 Export;The best competitor of Kronenbourg;heineken;piss</code></pre>
           </section>
 
           <section>
             <h4>Import beers (10000 lines)</h4>
 
             <pre><code class="bash">$ bin/console batch:import:beer beers_10k.csv --env=prod
-Memory: 10.49M
+Memory: 6.29M
 10000 entity written
-Time: 20.18s - Memory: 92.27M - Diff: 81.78M</code></pre>
+Time: 32.3s - Memory: 92.27M - Diff: 85.98M</code></pre>
 
             <div class="fragment">
               <h4>Import beers (20000 lines)</h4>
 
               <pre><code class="bash">$ bin/console batch:import:beer beers_20k.csv --env=prod
-
+Memory: 6.29M
 PHP Fatal error:
   Allowed memory size of 134217728 bytes exhausted
   (tried to allocate 20480 bytes)</code></pre>
@@ -550,7 +547,6 @@ PHP Fatal error:
               Useless to increase PHP memory limit,<br />
               it will probably break later with a bigger file
             </aside>
-
           </section>
 
           <section>
@@ -803,9 +799,9 @@ $this->assertSame($breweryA, $breweryB);</code></pre>
           <section>
             <h4>Detach entities</h4>
 
-            <pre><code class="php">// EntityWriter
-$this->em->flush();
+            <pre><code class="php">$this->em->flush();
 $this->em->clear('BeerBundle\Entity\Beer');
+
 // or loop on items and call detach
 foreach ($items as $item) {
   $this->em->detach($item);
@@ -813,15 +809,18 @@ foreach ($items as $item) {
 
             <h4>Previously:</h4>
             <pre><code class="bash">$ bin/console batch:import:beer beers_10k.csv --env=prod
-End: Time: 20.18s - Memory: 92.27M - Diff: 81.78M</code></pre>
+Time: 21.95s - Memory: 92.27M - Diff: 85.98M</code></pre>
 
             <div class="fragment">
               <h4>Now:</h4>
               <pre><code class="bash">$ bin/console batch:import:beer beers_10k.csv --env=prod
-End: Time: 20.91s - Memory: 69.21M - Diff: 56.63M</code></pre>
+Time: 21.89s - Memory: 69.21M - Diff: 62.92M</code></pre>
             </div>
 
-            <aside class="notes">Same perf between loop detach and clear($className)</aside>
+            <aside class="notes">
+              A bit less performant on 10k<br />
+              Same perf between loop detach and clear($className)
+            </aside>
           </section>
 
           <section>
@@ -868,19 +867,22 @@ End: Time: 20.91s - Memory: 69.21M - Diff: 56.63M</code></pre>
 
           <section>
             <h4>Clear UOW</h4>
-            <pre><code class="php">// EntityWriter
-$this->em->flush();
+            <pre><code class="php">$this->em->flush();
 $this->em->clear();</code></pre>
 
             <h4>Previously:</h4>
             <pre><code class="bash">$ bin/console batch:import:beer beers_10k.csv --env=prod
-End: Time: 20.91s - Memory: 69.21M - Diff: 56.63M</code></pre>
+Time: 21.89s - Memory: 69.21M - Diff: 62.92M</code></pre>
 
             <div class="fragment">
               <h4>Now:</h4>
               <pre><code class="bash">$ bin/console batch:import:beer beers_10k.csv --env=prod
-End: Time: 20.52s - Memory: 67.11M - Diff: 54.53M</code></pre>
+Time: 22.16s - Memory: 67.11M - Diff: 60.82M</code></pre>
             </div>
+
+            <aside class="notes">
+              A bit longer as we rehydrate each time categories and breweries
+            </aside>
           </section>
 
           <section>
@@ -915,9 +917,9 @@ End: Time: 20.52s - Memory: 67.11M - Diff: 54.53M</code></pre>
 		        <h2>Let's hunt last memory leaks</h2>
 
 		        <ul class="fragment">
-			        <li class="fragment grow">SingleSelectExecutor</li>
-			        <li class="fragment grow">ResultSetMapping</li>
-			        <li class="fragment grow">ParserResult</li>
+			        <li class="grow">SingleSelectExecutor</li>
+			        <li class="grow">ResultSetMapping</li>
+			        <li class="grow">ParserResult</li>
 		        </ul>
 
             <aside class="notes">
@@ -932,14 +934,14 @@ End: Time: 20.52s - Memory: 67.11M - Diff: 54.53M</code></pre>
 
 		        Analyze the memory with php-meminfo:
 
-		        <pre><code>Path from 0x7fa5eaa56280
+		        <pre><code class="smaller">Path from 0x7fa5eaa56280
 0x7fa5d8f14c00
 &uarr;
 _resultSetMapping (0x7fa5dc2af5c8)
 &uarr;
 0 (0x7fa5d9a11000)
 &uarr;
-sf_orm_default_a1536898803dafe5169a1bd008aad667f3b84c092cc24b9f4a3483342a35e6d6[72581bcf67100f31f4179c031c0fa291][1] (0x7fa5d8ee45e0)
+sf_orm_default_a1536898803dafe5...35e6d6[72581bc...1c0fa291][1] (0x7fa5d8ee45e0)
 &uarr;
 data (0x7fa5dc5b9b00)
 &uarr;
@@ -960,7 +962,7 @@ container (0x7fa5eaa56280)</code></pre>
 		        <pre><code class="php">public function findOneByIdentifier(string $code) {
     $qb = $this->createQueryBuilder('c');
     $qb->andWhere(
-        $qb->expr()->like('c.code', $qb->expr()->literal($code))
+        $qb->expr()->eq('c.code', $qb->expr()->literal($code))
     );
 
     $results = $qb->getQuery()->execute();
@@ -977,14 +979,14 @@ container (0x7fa5eaa56280)</code></pre>
 
 		        <pre><code class="php">$qb = $this->createQueryBuilder('c');
 $qb->andWhere(
-  $qb->expr()->like('c.code', $qb->expr()->literal($code))
+  $qb->expr()->eq('c.code', $qb->expr()->literal($code))
 );
 
 $results = $qb->getQuery()->execute();</code></pre>
 
             <div class="fragment">
               <h4>DQL</h4>
-              <pre><code class="sql smaller">SELECT c FROM BeerBundle\Entity\Beer c WHERE c.code LIKE 'dolorum-aliquid-maiores'</code></pre>
+              <pre><code class="sql smaller">SELECT c FROM BeerBundle\Entity\Beer c WHERE c.code = 'dolorum-aliquid-maiores'</code></pre>
             </div>
 	        </section>
 
@@ -993,7 +995,7 @@ $results = $qb->getQuery()->execute();</code></pre>
 
 		        <pre><code class="php">$qb = $this->createQueryBuilder('c');
 $qb->andWhere(
-  $qb->expr()->like('c.code', ':code')
+  $qb->expr()->eq('c.code', ':code')
 );
 $qb->setParameter('code', $code);
 
@@ -1001,7 +1003,7 @@ $results = $qb->getQuery()->execute();</code></pre>
 
             <div class="fragment">
               <h4>DQL</h4>
-              <pre><code class="sql">SELECT c FROM BeerBundle\Entity\Beer c WHERE c.code LIKE :code</code></pre>
+              <pre><code class="sql">SELECT c FROM BeerBundle\Entity\Beer c WHERE c.code = :code</code></pre>
             </div>
 
 	        </section>
@@ -1018,7 +1020,8 @@ $results = $qb->getQuery()->execute();</code></pre>
             </ul>
 
             <pre><code class="bash">$ bin/console batch:import:beer beers_10k.csv --env=prod
-End: Time: 14.38s - Memory: 14.68M - Diff: 3.89M</code></pre>
+Memory: 6.29M
+Time: 15.9s - Memory: 14.68M - Diff: 8.39M</code></pre>
 
             <aside class="notes">
               Persister instead of create DQL queries<br />
@@ -1032,8 +1035,8 @@ End: Time: 14.38s - Memory: 14.68M - Diff: 3.89M</code></pre>
             <h4>Analyze memory</h4>
 
             <pre><code class="bash">$ bin/console batch:import:beer beers_1M.csv --env=prod
-Memory: 10.49M
-End: Time: 2297.23s - Memory: 14.68M - Diff: 4.19M</code></pre>
+Memory: 6.29M
+Time: 1573.68s - Memory: 14.68M - Diff: 8.39M</code></pre>
 
             <img src="resources/gif/waouh.gif" />
 
@@ -1073,24 +1076,36 @@ End: Time: 2297.23s - Memory: 14.68M - Diff: 4.19M</code></pre>
           </section>
 
           <section>
-            <h4>Reader</h4>
+            <h4>Command to export beers</h4>
 
-            <pre><code class="php">public function read() {
-    if (null === $this->results) {
-        $this->results = $this->getResults();
-    }
+            <pre><code class="php smaller">$filepath = $input->getArgument('filepath');
+$fd = fopen($filepath, 'a+');
+$headers = ['code', 'name', 'description', 'percent', 'brewery', 'category'];
+fputcsv($fd, $headers, ';');
 
-    if (null !== $result = $this->results->current()) {
-        $this->results->next();
-    }
-
-    return $result;
+$beers = $this->getBeerRepository()->findAll();
+foreach ($beers as $beer) {
+    $csvRow = $this->process($beer);
+    fputcsv($fd, $csvRow, ';');
 }
 
-private function getResults() {
-    $results = $this->repository->findAll();
+fclose($fd);</code></pre>
+          </section>
 
-    return new \ArrayIterator($results);
+          <section>
+            <h4>Command to export beers</h4>
+
+            <pre><code class="php smaller">private function process(Beer $beer) {
+    $data = [];
+    $data['code'] = $beer->getCode();
+    $data['name'] = $beer->getName();
+    $data['description'] = $beer->getDescription();
+    $data['percent'] = $beer->getPercent();
+    $data['quotation'] = $beer->getQuotation();
+    $data['brewery'] = $beer->getBrewery()->getCode();
+    $data['category'] = $beer->getCategory()->getCode();
+
+    return $data;
 }</code></pre>
           </section>
 
@@ -1098,8 +1113,8 @@ private function getResults() {
             <h4>Launch the export</h4>
 
             <pre><code class="bash">$ bin/console batch:export:beer beers.csv --env=prod
-Memory: 10.49M
-End: Time: 1.05s - Memory: 46.14M - Diff: 35.65M</code></pre>
+Memory: 6.29M
+Time: 0.83s - Memory: 46.14M - Diff: 39.85M</code></pre>
 
             <table class="fragment small">
               <thead>
@@ -1114,22 +1129,19 @@ End: Time: 1.05s - Memory: 46.14M - Diff: 35.65M</code></pre>
               <tr><td>BeerBundle\Entity\Beer</td><td>10000</td></tr>
               </tbody>
             </table>
+            <aside class="notes">Proxy class comes from Doctrine lazy load</aside>
           </section>
 
           <section>
             <h4>Clear the UOW</h4>
 
-            <pre><code class="php">private function getResults()
-{
-    $results = $this->repository->findAll();
-    $this->repository->clear();
-
-    return new \ArrayIterator($results);
-}</code></pre>
+            <pre><code class="php">$beers = $this->getBeerRepository()->findAll();
+$this->getEntityManager()->clear();
+foreach ($beers as $beer) {</code></pre>
 
             <pre class="fragment"><code class="bash">bin/console batch:export:beer beers.csv --env=prod
-Memory: 10.49M
-End: Time: 1.32s - Memory: 46.14M - Diff: 35.65M</code></pre>
+Memory: 6.29M
+Time: 0.83s - Memory: 46.14M - Diff: 39.85M</code></pre>
 
             <table class="fragment small">
               <thead>
@@ -1145,7 +1157,7 @@ End: Time: 1.32s - Memory: 46.14M - Diff: 35.65M</code></pre>
             </table>
 
             <aside class="notes">
-              Clear since repository do a clear($className)
+              Better since repository do a clear($className)
             </aside>
           </section>
 
@@ -1266,13 +1278,14 @@ private function getResults() {
             <h3>Database cursor</h3>
 
             <pre><code class="bash">bin/console batch:export:beer beers.csv --env=prod
-End: Time: 112.78s - Memory: 14.68M - Diff: 4.19M</code></pre>
+Memory: 6.29M
+Time: 112.78s - Memory: 14.68M - Diff: 8.39M</code></pre>
 
             <div class="right">
               <div>Inconvenience: Once cursor is opened, not possible to have any other SELECT operations</div>
 
               <pre><code class="bash smaller">[PDOException]
-  SQLSTATE[HY000]: [...]Cannot execute queries while other unbuffered queries are active.</code></pre>
+  SQLSTATE[HY000]: [...]Cannot execute queries while other unbuffered queries are active</code></pre>
             </div>
 
             <aside class="notes">
@@ -1333,7 +1346,8 @@ End: Time: 112.78s - Memory: 14.68M - Diff: 4.19M</code></pre>
 }</code></pre>
 
             <pre><code class="bash fragment">$ bin/console batch:export:beer beers.csv --env=prod
-End: Time: 132.91s - Memory: 14.68M - Diff: 4.19M</code></pre>
+Memory: 6.29M
+Time: 132.91s - Memory: 14.68M - Diff: 8.39M</code></pre>
 
             <aside class="notes">
               20 secondes de plus qu'avec le database cursor<br />
