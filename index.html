@@ -87,6 +87,11 @@
               Ne pas reprocher à un outil de ne pas faire ce pour quoi il n'est pas fait<br />
             </aside>
           </section>
+
+          <section>
+            <img src="resources/img/paul.jpg" width="50%" /><img src="resources/img/mickey-mouse.png" width="35%" />
+          </section>
+
         </section>
 
         <section data-background="resources/pictures/background-model.jpg">
@@ -1200,7 +1205,9 @@ Time: 0.83s - Memory: 46.14M - Diff: 39.85M</code></pre>
             <h2>Find All</h2>
 
             <img src="resources/gif/barney_stinson_no.gif" />
+          </section>
 
+          <section>
             <div class="fragment">
               <ul>
                 <li>Take care about findAll</li>
@@ -1275,7 +1282,7 @@ Time: 0.83s - Memory: 46.14M - Diff: 39.85M</code></pre>
 
             <aside class="notes">
               once the query had been launched<br />
-              the results are made available one by one to the client that launched the query
+              the results are made available one by one to the client that launched the query<br />
             </aside>
           </section>
 
@@ -1303,6 +1310,11 @@ private function getResults() {
     $qb = $this->repository->createQueryBuilder('b');
     return $qb->getQuery()->iterate();
 }</code></pre>
+
+            <aside class="notes">
+              If you forget the setAttribute(); everything is put in a buffer in PDO<br />
+              La mémoire peut donc exploser
+            </aside>
           </section>
 
           <section>
@@ -1403,7 +1415,8 @@ Time: 132.91s - Memory: 14.68M - Diff: 8.39M</code></pre>
 
           <h2>Thank you</h2>
 
-          <a href="https://github.com/fitn/doctrine-batch/">https://github.com/fitn/doctrine-batch/</a>
+          <a href="https://github.com/fitn/doctrine-batch/">https://github.com/fitn/doctrine-batch/</a><br /><br />
+          <a href="https://joind.in/talk/e6e92">https://joind.in/talk/e6e92</a>
 
           <aside class="notes">
             Retour d'xp d'Akeneo<br />
