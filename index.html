@@ -41,7 +41,10 @@
             </div>
 
             <aside class="notes">
-              Beer addict<br />
+              Akeneo<br />
+              PIM<br />
+              Volumétrie<br />
+              Retour d'XP<br />
             </aside>
           </section>
 
@@ -50,30 +53,9 @@
             <h4>Doing batch with PHP and Doctrine</h4>
 
             <aside class="notes">
-              Pourquoi ce sujet ?<br />
-              PHP n'est pas fait pour le batch<br />
-              Doctrine n'est pas fait pour ça non plus<br />
-              Le but n'est pas de critiquer Doctrine ou de vous donner envie de l'utiliser<br />
-              Réutiliser votre stack permet de garder vos entités, validateurs, events, queries, etc.<br />
-              Réel retour d'XP sur des problèmes rencontrés<br />
-              J'espère que ce retour vous apprendra quelques astuces et pourra vous aider<br />
-            </aside>
-          </section>
-        </section>
-
-        <section data-background="resources/pictures/background-beers.jpg">
-          <section>
-            <h2>Site web</h2>
-            <ul>
-              <li>PHP 7</li>
-              <li>MySQL 5.7</li>
-              <li>Symfony 3.3</li>
-              <li>Doctrine 2.5</li>
-            </ul>
-            <aside class="notes">
-              Super site web qui recense toutes les bières, toutes les brasseries avec des commentaires des internautes !<br />
-              Une fois le site prêt, je me suis rendu compte qu'il allait falloir que j'importe tout un tas de données.<br />
-              Toute relation avec des projets existants ou ayant existés étant absolument fait exprès
+              Problèmes rencontrés chez Akeneo<br />
+              Qui connaît Doctrine ? Qui travaille tous les jours avec Doctrine ? Sur un projet l'utilisant ?<br />
+              Pas polémiquer ni évangéliser<br />
             </aside>
           </section>
 
@@ -88,7 +70,7 @@
             </ul>
 
             <aside class="notes">
-              Comparaison avec le fonctionnement d'autres langages type Java?
+              Mémoire par process<br />
             </aside>
           </section>
 
@@ -97,10 +79,32 @@
             <h3>Doctrine has not been done for batch processes</h3>
 
             <img src="resources/img/doctrine_batch_doc.png" />
+
+            <aside class="notes">
+              First error! Ne pas lire la doc<br />
+              Pester sur Doctriner pour corriger NOS erreurs<br />
+              Puis on s'est rendu compte qu'on l'utilisait mal<br />
+              Ne pas reprocher à un outil de ne pas faire ce pour quoi il n'est pas fait<br />
+            </aside>
           </section>
         </section>
 
         <section data-background="resources/pictures/background-model.jpg">
+          <section>
+            <h2>Site web</h2>
+            <ul>
+              <li>PHP 7</li>
+              <li>MySQL 5.7</li>
+              <li>Symfony 3.3</li>
+              <li>Doctrine 2.5</li>
+            </ul>
+            <aside class="notes">
+              Bière =)<br />
+              Appli pour illustrer ma prez<br />
+              Site web avec Bières et Brasseries<br />
+            </aside>
+          </section>
+
           <section>
             <h2>Model presentation</h2>
 
@@ -142,7 +146,7 @@
   {
       $qb = $this->createQueryBuilder('c');
       $qb->andWhere(
-          $qb->expr()->like('c.code', $qb->expr()->literal($code))
+          $qb->expr()->eq('c.code', $qb->expr()->literal($code))
       );
 
 
@@ -175,7 +179,9 @@
     quotation:
       [...]</code></pre>
 
-            <aside class="notes">Just a specific repository class to search entity from code</aside>
+            <aside class="notes">
+
+            </aside>
           </section>
 
           <section>
@@ -197,6 +203,24 @@
         referencedColumnName: id
             </code></pre>
           </section>
+
+          <section>
+            <h4>Beer application is ready!</h4>
+
+            <h4 class="fragment">Oh wait! We need to import data!</h4>
+
+            <div class="fragment"><img src="resources/gif/piti_chat_milk.gif" height="300" /></div>
+
+            <aside class="notes">
+              Create 1 = Create 10k<br />
+              Toute similitude avec des projets existants est absolument fait exprès<br />
+              Contrainte de temps, projet déjà fait, limiter les régressions, pas de contraintes de perf...<br />
+              Reuse stack is not bad (events, entities, mapping, queries, validators, etc.)<br />
+              Réduction du temps + limite des régressions<br />
+              A ce moment volumétrie cible = quelques milliers de références...<br />
+            </aside>
+          </section>
+
         </section>
 
         <section data-background="resources/pictures/background-brewery.jpg">
@@ -204,11 +228,15 @@
             <h2>Import breweries (1000 lines)</h2>
 
             <pre><code class="yaml">code;name;description
-id-quia;Dietrich Group;I know THAT
-id-quia;Dietrich Group;I know THAT
 abbey-ales;Abbey Ales Brewery;Abbey Ales Brewery
 black-sheep;Black Sheep Brewery;A black sheep brewery
 oakkham;Oakham Ales;The famous Oakham brewery</code></pre>
+
+            <aside class="notes">
+              Generate file with Faker lib from François Zaninotto<br />
+              Bdd vierge => CREATE<br />
+              Filepath as input<br />
+            </aside>
           </section>
 
           <section>
@@ -229,14 +257,15 @@ while ($csvRow = fgetcsv($fd, null, ';')) {
         // Write entity
         $this->getEntityManager()->persist($entity);
         $this->getEntityManager()->flush();
-        $writeCount++;
     } else {
         $this->printViolations($violations, $entity);
     }
 }</code></pre>
 
             <aside class="notes">
-              Filepath as input
+              `process()` permet d'instancier ou de récupérer de la base un objet<br />
+              Puis mettre à jour ses valeurs<br />
+              Voir slide suivant<br />
             </aside>
           </section>
 
@@ -265,7 +294,6 @@ private function findOrCreateBrewery(string $code)
 }</code></pre>
 
             <aside class="notes">
-              Filepath as input
             </aside>
           </section>
 
@@ -282,7 +310,6 @@ Memory: 6.29M
 Time: 21.24s - Memory: 20.97M - Diff: 14.68M</code></pre>
 
             <aside class="notes">
-              By default, batch size = 1<br />
               Take care! By default, commands are launched in dev environment!!!<br />
             </aside>
           </section>
@@ -348,6 +375,10 @@ if (0 === ++$writeCount % 100) {
 	          <h4>Validation process: batch size 1</h4>
 
 	          <img src="resources/img/doctrine_batch_schema_step1_batchsize_1.png" class="schema" />
+
+            <aside class="notes">
+              Explain UOW<br />
+            </aside>
           </section>
 
 	        <section>
@@ -381,18 +412,22 @@ if (0 === ++$writeCount % 100) {
           </section>
 
           <section>
-            <h4>Relaunch the import now!</h4>
-            <pre><code class="bash">Memory: 6.29M
-Entity "id-quia" not valid: The value "id-quia" is already set in another entity
-1000 entity written
-Import - Time: 1.95s - Memory: 20.97M - Diff: 14.68M</code></pre>
+            <h4>Relaunch the import!</h4>
 
-	          <h5>Previous results with batch size 1</h5>
+            <h5>Batch size 1</h5>
             <pre><code class="bash">Memory: 6.29M
 1001 entity written
 Time: 21.24s - Memory: 20.97M - Diff: 14.68M</code></pre>
 
-            <aside class="notes">Nette augmentation des perfs</aside>
+            <div class="frament">
+              <h5>Batch size = 100</h5>
+              <pre><code class="bash">Memory: 6.29M
+Entity "id-quia" not valid: The value "id-quia" is already set in another entity
+1000 entity written
+Import - Time: 1.95s - Memory: 20.97M - Diff: 14.68M</code></pre>
+            </div>
+
+            <aside class="notes">Nette augmentation des perfs grâce au batch size</aside>
           </section>
 
         </section>
@@ -515,7 +550,7 @@ Time: 0.05s - Memory: 14.68M - Diff: 8.39M</code></pre>
           </section>
         </section>
 
-        <section data-background="resources/pictures/background-leak.jpg">
+        <section data-background="resources/pictures/background-beers.jpg">
           <section>
             <h2>Import Beers (10000k lines)</h2>
 
@@ -1192,18 +1227,16 @@ Time: 0.83s - Memory: 46.14M - Diff: 39.85M</code></pre>
             </ul>
           </section>
 
-          <section class="vsep left">
-            <div class="left">
-              <img src="resources/img/sql_read_offset_limit.png" />
-            </div>
+          <section>
 
-            <div class="right">
-              <h4>Read offset/limit</h4>
-              <ul>
-                <li>Linear increase</li>
-                <li>Exponential cost per volume</li>
-              </ul>
-            </div>
+            <h4>Read offset/limit</h4>
+
+            <ul>
+              <li>Linear increase</li>
+              <li>Exponential cost per volume</li>
+            </ul><br />
+
+            <img src="resources/img/sql_read_offset_limit.png" width="50%" />
 
             <aside class="notes"></aside>
           </section>
@@ -1229,18 +1262,16 @@ Time: 0.83s - Memory: 46.14M - Diff: 39.85M</code></pre>
             </aside>
           </section>
 
-          <section class="vsep left">
-            <div class="left">
-              <img src="resources/img/sql_read_db_cursor.png" />
-            </div>
+          <section>
 
-            <div class="right">
-              <h4>Database cursor</h4>
-              <ul>
-                <li>No increase</li>
-                <li>Linear cost per volume</li>
-              </ul>
-            </div>
+            <h4>Database cursor</h4>
+
+            <ul>
+              <li>No increase</li>
+              <li>Linear cost per volume</li>
+            </ul><br />
+
+            <img src="resources/img/sql_read_db_cursor.png" width="50%" />
 
             <aside class="notes">
               once the query had been launched<br />
@@ -1294,23 +1325,20 @@ Time: 112.78s - Memory: 14.68M - Diff: 8.39M</code></pre>
             </aside>
           </section>
 
-          <section class="vsep left">
+          <section>
             <h4>Search after</h4>
 
-            <div class="left">
-              <img src="resources/img/sql_read_search_after.png" />
-            </div>
+            <ul>
+              <li>No increase</li>
+              <li>Linear cost per volume</li>
+            </ul><br />
 
-            <div class="right">
-              <ul>
-                <li>No increase</li>
-                <li>Linear cost per volume</li>
-              </ul>
-            </div>
+            <img src="resources/img/sql_read_search_after.png" width="50%" />
 
             <aside class="notes">
+              C'est l'échelle qui fait qu'on est sur une courbe non linéaire<br /
               Le problème du Offset-limit c'est de tout relire depuis le début<br />
-              Si on recherche après notre dernier résultat, on enlève ce problème
+              Si on recherche après notre dernier résultat, on enlève ce problème<br />
             </aside>
           </section>
 
@@ -1374,8 +1402,6 @@ Time: 132.91s - Memory: 14.68M - Diff: 8.39M</code></pre>
         <section data-background="resources/pictures/background-thanks.jpg">
 
           <h2>Thank you</h2>
-
-          <img src="resources/gif/piti_chat_milk.gif" height="300" />
 
           <a href="https://github.com/fitn/doctrine-batch/">https://github.com/fitn/doctrine-batch/</a>
 
