@@ -42,8 +42,9 @@
 
             <aside class="notes">
               Akeneo<br />
-              PIM<br />
-              Volumétrie<br />
+              Solution PIM opensource -> outil de gestion de catalogues produits destinés aux équipes marketing<br />
+              Enrichir les données puis diffusion sur des canaux de vente<br />
+              Travail sur des volumétries de 10M de produits<br />
               Retour d'XP<br />
             </aside>
           </section>
@@ -53,15 +54,16 @@
             <h4>Doing batch with PHP and Doctrine</h4>
 
             <aside class="notes">
-              Problèmes rencontrés chez Akeneo<br />
-              Qui connaît Doctrine ? Qui travaille tous les jours avec Doctrine ?<br />
+              Problèmes rencontrés chez Akeneo avec Doctrine et les traitements de masse<br />
+              Qui travaille sur un projet qui utilise Doctrine ?<br />
+              Apprendre des choses, astuces<br />
               Pourquoi ce titre ?<br />
             </aside>
           </section>
 
           <section>
             <div><img src="resources/icons/php.png" class="medium-icon" /></div>
-            <h3>PHP is not done for batch processes</h3>
+            <h3>PHP has not been done for batch processes</h3>
 
             <ul>
               <li>HTTP requests</li>
@@ -85,7 +87,6 @@
               First error! Ne pas lire la doc<br />
               Pester sur Doctriner pour corriger NOS erreurs<br />
               Puis on s'est rendu compte qu'on l'utilisait mal<br />
-              Ne pas reprocher à un outil de ne pas faire ce pour quoi il n'est pas fait<br />
             </aside>
           </section>
 
@@ -219,11 +220,10 @@
 
             <aside class="notes">
               Create 1 = Create 10k<br />
-              Toute similitude avec des projets existants est absolument fait exprès<br />
-              Contrainte de temps, projet déjà fait, limiter les régressions, pas de contraintes de perf...<br />
-              Reuse stack is not bad (events, entities, mapping, queries, validators, etc.)<br />
+              Contrainte de temps, TMA, limiter les régressions, pas de contraintes de perf...<br />
+              Reuse stack s'est fait naturellement chez Akeneo (events, entities, mapping, queries, validators, etc.)<br />
               Decrease time + No regression<br />
-              Target = 1k<br />
+              Akeneo Target = 5k<br />
             </aside>
           </section>
 
@@ -239,7 +239,6 @@ black-sheep;Black Sheep Brewery;A black sheep brewery
 oakkham;Oakham Ales;The famous Oakham brewery</code></pre>
 
             <aside class="notes">
-              Generate file with Faker lib from François Zaninotto<br />
               Bdd vierge => CREATE<br />
               Sf Command with filepath as input<br />
             </aside>
@@ -358,7 +357,6 @@ if (0 === ++$writeCount % 100) {
 
             <aside class="notes">
               I relaunch the same import<br />
-              2 times the same code in my file<br />
             </aside>
           </section>
 
@@ -385,8 +383,7 @@ if (0 === ++$writeCount % 100) {
 	          <img src="resources/img/doctrine_batch_schema_step1_batchsize_1.png" class="schema" />
 
             <aside class="notes">
-              UOW<br />
-              Doctrine stack<br />
+              Doctrine UOW<br />
               Service responsable de gérer toutes les entités en relation avec la BDD<br />
               $brewery = 'id-quia'<br />
             </aside>
@@ -478,11 +475,10 @@ Entity "id-quia" not valid: This value is too long.
     1406 Data too long for column 'name' at row 1</code></pre>
 
             <aside class="notes">
-              La validation a bien lieu est remonté, l'objet n'est pas persisté.<br />
-	            Mais un update est quand même envoyé.<br />
-              Ici on voit l'erreur et la bdd fait que ça remonte, mais on peut en imaginer d'autres<br />
-              Hard to detect<br />
-              Avant MySQL 5.7, update with truncated value<br />
+              Validation done and error thrown<br />
+	            UPDATE query<br />
+              Error from MySQL mais on peut en imaginer d'autres<br />
+              Before MySQL 5.7, update with truncated value!!! Merci MySQL !!<br />
             </aside>
           </section>
 
@@ -493,10 +489,9 @@ Entity "id-quia" not valid: This value is too long.
 
             <aside class="notes">
               No persist<br />
-              Explication update et UOW<br />
-              2 ways to fix:<br />
-              - detach entity from UOW<br />
-              - analyze how diff is calculated to prepare update<br />
+              UOW est responsable de calculer le diff depuis la dernière synchro avec la BDD<br />
+              Entity has been changed<br />
+              Analyze how diff is calculated to prepare update<br />
             </aside>
 
           </section>
@@ -610,15 +605,14 @@ PHP Fatal error:
           <section>
             <h4>Memory consumption</h4>
 
-            <img src="resources/img/chart-doctrine-memory-leak.png" />
+            <img src="resources/img/chart-doctrine-memory-leak.png" width="50%" /><br />
+            <img src="resources/gif/truck_explosion.gif" width="25%" class="fragment" />
 
             <aside class="notes">
               Every 5000 items<br />
               300k items
             </aside>
           </section>
-
-          <section data-background="resources/gif/truck_explosion.gif"></section>
 
           <section>
             <h3>Explanation memory leak problems</h3>
@@ -633,6 +627,7 @@ PHP Fatal error:
             <aside class="notes">
               3. not able to free memory (objects still used in UOW)<br />
               4. It leads to an increase of CPU usage of the process<br />
+              Mais comment savoir quels objets sont en mémoire et à quoi ils sont liés<br />
             </aside>
           </section>
 
@@ -1008,7 +1003,7 @@ Time: 22.16s - Memory: 67.11M - Diff: 60.82M</code></pre>
 	        <section>
 		        <h4>How to query entities?!</h4>
 
-            <h5>Previously:</h5>
+            <h5>Bad code:</h5>
 		        <pre><code class="php">$qb = $this->createQueryBuilder('c');
 $qb->andWhere(
   $qb->expr()->eq('c.code', $qb->expr()->literal($code))
@@ -1018,7 +1013,7 @@ $results = $qb->getQuery()->execute();</code></pre>
             <pre><code class="sql smaller">SELECT c FROM BeerBundle\Entity\Beer c WHERE c.code = 'chaquip-beer'</code></pre>
 
             <div class="fragment">
-              <h5>Now:</h5>
+              <h5>Good code:</h5>
 		          <pre><code class="php">$qb = $this->createQueryBuilder('c');
 $qb->andWhere(
   $qb->expr()->eq('c.code', ':code')
@@ -1083,26 +1078,6 @@ Time: 1573.68s - Memory: 14.68M - Diff: 8.39M</code></pre>
             </aside>
           </section>
 
-        </section>
-
-        <section data-background="resources/pictures/background-import-summary.jpg">
-          <section>
-            <h2>Mission accomplished!</h2>
-
-            <img src="resources/gif/cat_shakes.gif" />
-          </section>
-
-          <section>
-            <h3>In a nutshell</h3>
-            <ul>
-              <li class="fragment">Use production environment</li>
-              <li class="fragment">Find the right moment to flush</li>
-              <li class="fragment">Rework validation</li>
-              <li class="fragment">Change Tracking Policy</li>
-              <li class="fragment">Clear UOW</li>
-              <li class="fragment">Take care at your queries</li>
-            </ul>
-          </section>
         </section>
 
         <section data-background="resources/pictures/background-export.jpg">
@@ -1216,20 +1191,6 @@ Time: 0.83s - Memory: 46.14M - Diff: 39.85M</code></pre>
           </section>
 
           <section>
-
-            <h4>Read offset/limit</h4>
-
-            <ul>
-              <li>Linear increase</li>
-              <li>Exponential cost per volume</li>
-            </ul><br />
-
-            <img src="resources/img/sql_read_offset_limit.png" width="50%" />
-
-            <aside class="notes"></aside>
-          </section>
-
-          <section>
             <h4>Read offset/limit</h4>
 
             <pre><code class="sql">mysql> SELECT * FROM beer;
@@ -1251,7 +1212,19 @@ Time: 0.83s - Memory: 46.14M - Diff: 39.85M</code></pre>
           </section>
 
           <section>
+            <h4>Read offset/limit</h4>
 
+            <ul>
+              <li>Linear increase</li>
+              <li>Exponential cost per volume</li>
+            </ul><br />
+
+            <img src="resources/img/sql_read_offset_limit.png" width="50%" />
+
+            <aside class="notes"></aside>
+          </section>
+
+          <section>
             <h4>Database cursor</h4>
 
             <ul>
@@ -1270,26 +1243,15 @@ Time: 0.83s - Memory: 46.14M - Diff: 39.85M</code></pre>
           <section>
             <h4>Database cursor</h4>
 
-            <pre><code class="php">public function __construct(EntityManager $em) {
-        $em->getConnection()
-            ->getWrappedConnection()
-            ->setAttribute(\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
-        $this->repository = $em->getRepository('BeerBundle\Entity\Beer');
-}
+            <pre><code class="php">$em->getConnection()
+    ->getWrappedConnection()
+    ->setAttribute(\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
 
-public function read() {
-    //...
-    $result = $this->results->next();
-    if (null !== $result) {
-        if (++$this->readCount % 100 === 0)
-            $this->getEntityManager()->clear();
-        return $result[0];
-    }
-}
-
-private function getResults() {
-    $qb = $this->repository->createQueryBuilder('b');
-    return $qb->getQuery()->iterate();
+$qb = $this->repository->createQueryBuilder('b');
+while ($result = $qb->getQuery()->iterate()) {
+    // Do something...
+    if (++$this->readCount % 100 === 0)
+        $this->getEntityManager()->clear();
 }</code></pre>
 
             <aside class="notes">
@@ -1374,33 +1336,47 @@ Time: 132.91s - Memory: 14.68M - Diff: 8.39M</code></pre>
 
         </section>
 
-        <section data-background="resources/pictures/background-whats_next.jpg">
-          <h2>What's next?</h2>
-
-          <ul>
-            <li>Multi import</li>
-            <li>Improve performance</li>
-            <li>Mass Delete</li>
-          </ul>
-
-          <aside class="notes">
-            1. Import brewery + beers at the same time<br />
-            2. Change Tracking Policy using notify
-          </aside>
-        </section>
-
         <section data-background="resources/pictures/background-thanks.jpg">
 
-          <h2>Thank you</h2>
+          <section>
+            <h3>In a nutshell</h3>
+            <ul>
+              <li class="fragment">Find the right moment to flush</li>
+              <li class="fragment">Rework validation</li>
+              <li class="fragment">Change Tracking Policy</li>
+              <li class="fragment">Clear UOW</li>
+              <li class="fragment">Take care at your queries</li>
+            </ul>
+          </section>
 
-          <a href="https://github.com/fitn/doctrine-batch/">https://github.com/fitn/doctrine-batch/</a><br /><br />
-          <a href="https://joind.in/talk/e6e92">https://joind.in/talk/e6e92</a>
+          <section>
+            <h2>What's next?</h2>
 
-          <aside class="notes">
-            Retour d'xp d'Akeneo<br />
-            J'espère que vous avez appris quelques petits trucs<br />
-            Et que vous aurez envie de creuser un peu plus doctrine
-          </aside>
+            <ul>
+              <li>Parallel import</li>
+              <li>Improve performance</li>
+              <li>Mass Delete</li>
+              <li>Export data from SQL</li>
+            </ul>
+
+            <aside class="notes">
+              1. Import brewery + beers at the same time<br />
+              2. Change Tracking Policy using notify
+            </aside>
+          </section>
+
+          <section>
+            <h2>Thank you</h2>
+
+            <a href="https://github.com/fitn/doctrine-batch/">https://github.com/fitn/doctrine-batch/</a><br /><br />
+            <a href="https://joind.in/talk/e6e92">https://joind.in/talk/e6e92</a>
+
+            <aside class="notes">
+              Retour d'xp d'Akeneo<br />
+              J'espère que vous avez appris quelques petits trucs<br />
+              Et que vous aurez envie de creuser un peu plus doctrine
+            </aside>
+          </section>
         </section>
 
       </div>
